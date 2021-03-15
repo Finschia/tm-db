@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 
-	db "github.com/tendermint/tm-db"
-	protodb "github.com/tendermint/tm-db/remotedb/proto"
+	db "github.com/line/tm-db/v2"
+	protodb "github.com/line/tm-db/v2/remotedb/proto"
 )
 
 // ListenAndServe is a blocking function that sets up a gRPC based
