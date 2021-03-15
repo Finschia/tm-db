@@ -1,6 +1,6 @@
 GOTOOLS = github.com/golangci/golangci-lint/cmd/golangci-lint
 PACKAGES=$(shell go list ./...)
-INCLUDE = -I=${GOPATH}/src/github.com/tendermint/tm-db -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
+INCLUDE = -I=${GOPATH}/src/github.com/line/tm-db/v2 -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
 
 export GO111MODULE = on
 

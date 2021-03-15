@@ -1,6 +1,6 @@
-module github.com/tendermint/tm-db
+module github.com/line/tm-db/v2
 
-go 1.12
+go 1.15
 
 require (
 	github.com/dgraph-io/badger/v2 v2.2007.2
