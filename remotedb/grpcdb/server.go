@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials"
 
 	db "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/metadb"
 	protodb "github.com/line/tm-db/v2/remotedb/proto"
 )
 
@@ -64,7 +65,7 @@ func (s *server) Init(ctx context.Context, in *protodb.Init) (*protodb.Entity, e
 	defer s.mu.Unlock()
 
 	var err error
-	s.db, err = db.NewDB(in.Name, db.BackendType(in.Type), in.Dir)
+	s.db, err = metadb.NewDB(in.Name, metadb.BackendType(in.Type), in.Dir)
 	if err != nil {
 		return nil, err
 	}
