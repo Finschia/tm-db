@@ -2,6 +2,7 @@ package rocksdb
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -20,6 +21,11 @@ type RocksDB struct {
 var _ tmdb.DB = (*RocksDB)(nil)
 
 func NewDB(name string, dir string) (*RocksDB, error) {
+	err := os.MkdirAll(dir, 0755)
+	if err != nil {
+		return nil, err
+	}
+
 	// default rocksdb option, good enough for most cases, including heavy workloads.
 	// 1GB table cache, 512MB write buffer(may use 50% more on heavy workloads).
 	// compression: snappy as default, need to -lsnappy to enable.
