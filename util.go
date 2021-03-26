@@ -21,7 +21,7 @@ func concat(bz1 []byte, bz2 []byte) (ret []byte) {
 		return cp(bz1)
 	}
 
-	ret = make([]byte, bz1len+len(bz2))
+	ret = make([]byte, bz1len+bz2len)
 	copy(ret, bz1)
 	copy(ret[bz1len:], bz2)
 	return ret
