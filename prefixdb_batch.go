@@ -22,7 +22,7 @@ func (pb prefixDBBatch) Set(key, value []byte) error {
 	if value == nil {
 		return ErrValueNil
 	}
-	pkey := append(cp(pb.prefix), key...)
+	pkey := concat(pb.prefix, key)
 	return pb.source.Set(pkey, value)
 }
 
@@ -31,7 +31,7 @@ func (pb prefixDBBatch) Delete(key []byte) error {
 	if len(key) == 0 {
 		return ErrKeyEmpty
 	}
-	pkey := append(cp(pb.prefix), key...)
+	pkey := concat(pb.prefix, key)
 	return pb.source.Delete(pkey)
 }
 

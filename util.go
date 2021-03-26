@@ -11,6 +11,22 @@ func cp(bz []byte) (ret []byte) {
 	return ret
 }
 
+func concat(bz1 []byte, bz2 []byte) (ret []byte) {
+	bz1len := len(bz1)
+	if bz1len == 0 {
+		return cp(bz2)
+	}
+	bz2len := len(bz2)
+	if bz2len == 0 {
+		return cp(bz1)
+	}
+
+	ret = make([]byte, bz1len+len(bz2))
+	copy(ret, bz1)
+	copy(ret[bz1len:], bz2)
+	return ret
+}
+
 // Returns a slice of the same length (big endian)
 // except incremented by one.
 // Returns nil on overflow (e.g. if bz bytes are all 0xFF)
