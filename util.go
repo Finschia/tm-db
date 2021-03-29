@@ -65,3 +65,11 @@ func FileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return !os.IsNotExist(err)
 }
+
+// Path
+func MakePath(path string) error {
+	if len(path) == 0 {
+		return nil
+	}
+	return os.MkdirAll(path, 0755)
+}

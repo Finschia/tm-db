@@ -2,7 +2,6 @@ package cleveldb
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/jmhodges/levigo"
@@ -22,7 +21,7 @@ var _ tmdb.DB = (*CLevelDB)(nil)
 
 // New creates a new CLevelDB.
 func NewDB(name string, dir string) (*CLevelDB, error) {
-	err := os.MkdirAll(dir, 0755)
+	err := tmdb.MakePath(dir)
 	if err != nil {
 		return nil, err
 	}

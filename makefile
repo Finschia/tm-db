@@ -49,6 +49,33 @@ test-all-docker:
 	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb -v
 .PHONY: test-all-docker
 
+bench:
+	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb
+
+bench-memdb:
+	@go test -bench=. $(PACKAGES) -tags memdb
+
+bench-goleveldb:
+	@go test -bench=. $(PACKAGES) -tags goleveldb
+
+bench-cleveldb:
+	@go test -bench=. $(PACKAGES) -tags cleveldb
+
+bench-rocksdb:
+	@go test -bench=. $(PACKAGES) -tags rocksdb
+
+bench-boltdb:
+	@go test -bench=. $(PACKAGES) -tags boltdb
+
+bench-badgerdb:
+	@go test -bench=. $(PACKAGES) -tags badgerdb
+
+bench-remotedb:
+	@go test -bench=. $(PACKAGES) -tags goleveldb,remotedb
+
+bench-all:
+	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
+
 lint:
 	@echo "--> Running linter"
 	@golangci-lint run
