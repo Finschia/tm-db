@@ -1,33 +1,33 @@
-// +build rocksdb
+// +build badgerdb
 
-package rocksdb
+package badgerdb
 
 import (
 	"testing"
 
 	"github.com/line/tm-db/v2/internal/dbtest"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestRocksDBBNewDB(t *testing.T) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func TestBadgerDBBNewDB(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
 }
 
-func TestRocksDBStats(t *testing.T) {
-	name, dir := dbtest.NewTestName("rocksdb")
-	db, err := NewDB(name, dir)
-	defer dbtest.CleanupDB(db, name, dir)
-	require.NoError(t, err)
+// TODO implement badgerDB.Status()
+// func TestBadgerDBStats(t *testing.T) {
+// 	name, dir := dbtest.NewTestName("badgerdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(t, err)
+//
+// 	assert.NotEmpty(t, db.Stats())
+// }
 
-	assert.NotEmpty(t, db.Stats())
-}
-
-func TestRocksDBIterator(t *testing.T) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func TestBadgerDBIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -35,8 +35,8 @@ func TestRocksDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
-func TestRocksDBBatch(t *testing.T) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func TestBadgerDBBatch(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -44,8 +44,8 @@ func TestRocksDBBatch(t *testing.T) {
 	dbtest.TestDBBatch(t, db)
 }
 
-func BenchmarkRocksDBRangeScans1M(b *testing.B) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func BenchmarkBadgerDBRangeScans1M(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)
@@ -53,8 +53,8 @@ func BenchmarkRocksDBRangeScans1M(b *testing.B) {
 	dbtest.BenchmarkRangeScans(b, db, int64(1e6))
 }
 
-func BenchmarkRocksDBRangeScans10M(b *testing.B) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func BenchmarkBadgerDBRangeScans10M(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)
@@ -62,8 +62,8 @@ func BenchmarkRocksDBRangeScans10M(b *testing.B) {
 	dbtest.BenchmarkRangeScans(b, db, int64(10e6))
 }
 
-func BenchmarkRocksDBRandomReadsWrites(b *testing.B) {
-	name, dir := dbtest.NewTestName("rocksdb")
+func BenchmarkBadgerDBRandomReadsWrites(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)
