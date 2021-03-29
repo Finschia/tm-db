@@ -2,8 +2,6 @@ package metadb
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	tmdb "github.com/line/tm-db/v2"
@@ -34,11 +32,10 @@ func init() {
 
 func testBackendGetSetDelete(t *testing.T, backend BackendType) {
 	// Default
-	dirname, err := ioutil.TempDir("", fmt.Sprintf("test_backend_%s_", backend))
-	require.Nil(t, err)
-	db, err := NewDB("testdb", backend, dirname)
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", backend))
+	db, err := NewDB(name, backend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dirname, "testdb")
 
 	// A nonexistent key should return nil.
 	value, err := db.Get([]byte("a"))
@@ -146,10 +143,10 @@ func TestGoLevelDBBackend(t *testing.T) {
 	if _, ok := backends[GoLevelDBBackend]; !ok {
 		t.Skip("skipping since -tags=goleveldb was not used")
 	}
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	db, err := NewDB(name, GoLevelDBBackend, "")
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", GoLevelDBBackend))
+	db, err := NewDB(name, GoLevelDBBackend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir("", name)
 
 	_, ok := db.(*goleveldb.GoLevelDB)
 	assert.True(t, ok)
@@ -159,13 +156,10 @@ func TestCLevelDBBackend(t *testing.T) {
 	if _, ok := backends[CLevelDBBackend]; !ok {
 		t.Skip("skipping since -tags=cleveldb was not used")
 	}
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	// Can't use "" (current directory) or "./" here because levigo.Open returns:
-	// "Error initializing DB: IO error: test_XXX.db: Invalid argument"
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", CLevelDBBackend))
 	db, err := NewDB(name, CLevelDBBackend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	_, ok := db.(*cleveldb.CLevelDB)
 	assert.True(t, ok)
@@ -175,11 +169,10 @@ func TestCLevelDBStats(t *testing.T) {
 	if _, ok := backends[CLevelDBBackend]; !ok {
 		t.Skip("skipping since -tags=cleveldb was not used")
 	}
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", CLevelDBBackend))
 	db, err := NewDB(name, CLevelDBBackend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	assert.NotEmpty(t, db.Stats())
 }
@@ -188,11 +181,10 @@ func TestRocksDBBackend(t *testing.T) {
 	if _, ok := backends[RocksDBBackend]; !ok {
 		t.Skip("skipping since -tags=rocksdb was not used")
 	}
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", RocksDBBackend))
 	db, err := NewDB(name, RocksDBBackend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	_, ok := db.(*rocksdb.RocksDB)
 	assert.True(t, ok)
@@ -202,11 +194,10 @@ func TestRocksDBStats(t *testing.T) {
 	if _, ok := backends[RocksDBBackend]; !ok {
 		t.Skip("skipping since -tags=rocksdb was not used")
 	}
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", RocksDBBackend))
 	db, err := NewDB(name, RocksDBBackend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	assert.NotEmpty(t, db.Stats())
 }
@@ -220,11 +211,10 @@ func TestDBIterator(t *testing.T) {
 }
 
 func testDBIterator(t *testing.T, backend BackendType) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", backend))
 	db, err := NewDB(name, backend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	for i := 0; i < 10; i++ {
 		if i != 6 { // but skip 6.
@@ -360,11 +350,10 @@ func testDBIterator(t *testing.T, backend BackendType) {
 		[]int64(nil), "reverse iterator from 2 (ex) to 4")
 
 	// Ensure that the iterators don't panic with an empty database.
-	dir2, err := ioutil.TempDir("", "tm-db-test")
+	name2, dir2 := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", backend))
+	db2, err := NewDB(name2, backend, dir2)
+	defer dbtest.CleanupDB(db2, name2, dir2)
 	require.NoError(t, err)
-	db2, err := NewDB(name, backend, dir2)
-	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir2, name)
 
 	itr, err = db2.Iterator(nil, nil)
 	require.NoError(t, err)
@@ -373,7 +362,6 @@ func testDBIterator(t *testing.T, backend BackendType) {
 	ritr, err = db2.ReverseIterator(nil, nil)
 	require.NoError(t, err)
 	verifyIterator(t, ritr, nil, "reverse iterator with empty db")
-
 }
 
 func verifyIterator(t *testing.T, itr tmdb.Iterator, expected []int64, msg string) {
@@ -395,11 +383,10 @@ func TestDBBatch(t *testing.T) {
 }
 
 func testDBBatch(t *testing.T, backend BackendType) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
+	name, dir := dbtest.NewTestName(fmt.Sprintf("test_backend_%s", backend))
 	db, err := NewDB(name, backend, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	defer dbtest.CleanupDBDir(dir, name)
 
 	// create a new batch, and some items - they should not be visible until we write
 	batch := db.NewBatch()

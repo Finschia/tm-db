@@ -3,8 +3,6 @@
 package boltdb
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/line/tm-db/v2/internal/dbtest"
@@ -12,25 +10,17 @@ import (
 )
 
 func TestBoltDBNewBoltDB(t *testing.T) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
-	defer dbtest.CleanupDBDir(dir, name)
-
+	name, dir := dbtest.NewTestName("boltdb")
 	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	db.Close()
 }
 
 func BenchmarkBoltDBRandomReadsWrites(b *testing.B) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	db, err := NewDB(name, "")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer func() {
-		db.Close()
-		dbtest.CleanupDBDir("", name)
-	}()
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(b, err)
 
 	dbtest.BenchmarkRandomReadsWrites(b, db)
 }

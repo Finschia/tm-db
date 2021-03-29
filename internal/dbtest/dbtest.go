@@ -3,6 +3,7 @@ package dbtest
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -13,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//----------------------------------------
+// ----------------------------------------
 // Helper functions.
 
 func Valid(t *testing.T, itr tmdb.Iterator, expected bool) {
@@ -68,7 +69,17 @@ func ValuePanics(t *testing.T, itr tmdb.Iterator) {
 	assert.Panics(t, func() { itr.Value() })
 }
 
-func CleanupDBDir(dir, name string) {
+func NewTestName(prefix string) (name, dir string) {
+	name = fmt.Sprintf("%s_%x", prefix, RandStr(12))
+	dir = os.TempDir()
+	return name, dir
+}
+
+func CleanupDB(db tmdb.DB, name, dir string) {
+	if db != nil {
+		_ = db.Close()
+	}
+
 	err := os.RemoveAll(filepath.Join(dir, name) + ".db")
 	if err != nil {
 		panic(err)
@@ -201,6 +212,5 @@ func BenchmarkRandomReadsWrites(b *testing.B, db tmdb.DB) {
 				}
 			}
 		}
-
 	}
 }
