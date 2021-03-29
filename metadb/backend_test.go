@@ -11,6 +11,7 @@ import (
 	"github.com/line/tm-db/v2/goleveldb"
 	"github.com/line/tm-db/v2/internal/dbtest"
 	"github.com/line/tm-db/v2/memdb"
+	"github.com/line/tm-db/v2/prefixdb"
 	"github.com/line/tm-db/v2/rocksdb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,7 +28,7 @@ func init() {
 		mdb.Set([]byte("test"), []byte{0})
 		mdb.Set([]byte("u"), []byte{21})
 		mdb.Set([]byte("z"), []byte{26})
-		return tmdb.NewPrefixDB(mdb, []byte("test/")), nil
+		return prefixdb.NewDB(mdb, []byte("test/")), nil
 	}, false)
 }
 

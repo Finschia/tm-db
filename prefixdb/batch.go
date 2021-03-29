@@ -1,13 +1,17 @@
-package db
+package prefixdb
+
+import (
+	tmdb "github.com/line/tm-db/v2"
+)
 
 type prefixDBBatch struct {
 	prefix []byte
-	source Batch
+	source tmdb.Batch
 }
 
-var _ Batch = (*prefixDBBatch)(nil)
+var _ tmdb.Batch = (*prefixDBBatch)(nil)
 
-func newPrefixBatch(prefix []byte, source Batch) prefixDBBatch {
+func newPrefixBatch(prefix []byte, source tmdb.Batch) prefixDBBatch {
 	return prefixDBBatch{
 		prefix: prefix,
 		source: source,
@@ -17,21 +21,21 @@ func newPrefixBatch(prefix []byte, source Batch) prefixDBBatch {
 // Set implements Batch.
 func (pb prefixDBBatch) Set(key, value []byte) error {
 	if len(key) == 0 {
-		return ErrKeyEmpty
+		return tmdb.ErrKeyEmpty
 	}
 	if value == nil {
-		return ErrValueNil
+		return tmdb.ErrValueNil
 	}
-	pkey := concat(pb.prefix, key)
+	pkey := tmdb.Concat(pb.prefix, key)
 	return pb.source.Set(pkey, value)
 }
 
 // Delete implements Batch.
 func (pb prefixDBBatch) Delete(key []byte) error {
 	if len(key) == 0 {
-		return ErrKeyEmpty
+		return tmdb.ErrKeyEmpty
 	}
-	pkey := concat(pb.prefix, key)
+	pkey := tmdb.Concat(pb.prefix, key)
 	return pb.source.Delete(pkey)
 }
 
