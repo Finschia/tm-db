@@ -1,3 +1,5 @@
+// +build goleveldb
+
 package goleveldb
 
 import (
