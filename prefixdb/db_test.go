@@ -1,4 +1,4 @@
-package db_test
+package prefixdb_test
 
 import (
 	"testing"
@@ -6,6 +6,7 @@ import (
 	tmdb "github.com/line/tm-db/v2"
 	"github.com/line/tm-db/v2/internal/dbtest"
 	"github.com/line/tm-db/v2/memdb"
+	"github.com/line/tm-db/v2/prefixdb"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,7 +26,7 @@ func mockDBWithStuff(t *testing.T) tmdb.DB {
 
 func TestPrefixDBSimple(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	dbtest.Value(t, pdb, []byte("key"), nil)
 	dbtest.Value(t, pdb, []byte("key1"), nil)
@@ -42,7 +43,7 @@ func TestPrefixDBSimple(t *testing.T) {
 
 func TestPrefixDBIterator1(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	itr, err := pdb.Iterator(nil, nil)
 	require.NoError(t, err)
@@ -59,7 +60,7 @@ func TestPrefixDBIterator1(t *testing.T) {
 
 func TestPrefixDBReverseIterator1(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	itr, err := pdb.ReverseIterator(nil, nil)
 	require.NoError(t, err)
@@ -76,7 +77,7 @@ func TestPrefixDBReverseIterator1(t *testing.T) {
 
 func TestPrefixDBReverseIterator5(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	itr, err := pdb.ReverseIterator([]byte("1"), nil)
 	require.NoError(t, err)
@@ -93,7 +94,7 @@ func TestPrefixDBReverseIterator5(t *testing.T) {
 
 func TestPrefixDBReverseIterator6(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	itr, err := pdb.ReverseIterator([]byte("2"), nil)
 	require.NoError(t, err)
@@ -108,7 +109,7 @@ func TestPrefixDBReverseIterator6(t *testing.T) {
 
 func TestPrefixDBReverseIterator7(t *testing.T) {
 	db := mockDBWithStuff(t)
-	pdb := tmdb.NewPrefixDB(db, []byte("key"))
+	pdb := prefixdb.NewDB(db, []byte("key"))
 
 	itr, err := pdb.ReverseIterator(nil, []byte("2"))
 	require.NoError(t, err)

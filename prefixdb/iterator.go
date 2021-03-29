@@ -1,20 +1,22 @@
-package db
+package prefixdb
 
 import (
 	"bytes"
 	"fmt"
+
+	tmdb "github.com/line/tm-db/v2"
 )
 
 // IteratePrefix is a convenience function for iterating over a key domain
 // restricted by prefix.
-func IteratePrefix(db DB, prefix []byte) (Iterator, error) {
+func IteratePrefix(db tmdb.DB, prefix []byte) (tmdb.Iterator, error) {
 	var start, end []byte
 	if len(prefix) == 0 {
 		start = nil
 		end = nil
 	} else {
-		start = cp(prefix)
-		end = cpIncr(prefix)
+		start = tmdb.Cp(prefix)
+		end = tmdb.CpIncr(prefix)
 	}
 	itr, err := db.Iterator(start, end)
 	if err != nil {
@@ -28,14 +30,14 @@ type prefixDBIterator struct {
 	prefix []byte
 	start  []byte
 	end    []byte
-	source Iterator
+	source tmdb.Iterator
 	valid  bool
 	err    error
 }
 
-var _ Iterator = (*prefixDBIterator)(nil)
+var _ tmdb.Iterator = (*prefixDBIterator)(nil)
 
-func newPrefixIterator(prefix, start, end []byte, source Iterator) (*prefixDBIterator, error) {
+func newPrefixIterator(prefix, start, end []byte, source tmdb.Iterator) (*prefixDBIterator, error) {
 	pitrInvalid := &prefixDBIterator{
 		prefix: prefix,
 		start:  start,
