@@ -1,3 +1,5 @@
+// +build memdb
+
 package memdb
 
 import (

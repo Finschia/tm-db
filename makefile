@@ -10,7 +10,7 @@ all: lint test
 ## By default this will only test memdb & goleveldb
 test:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -v
+	@go test $(PACKAGES) -tags memdb,goleveldb -v
 
 test-memdb:
 	@echo "--> Running go test"
@@ -36,13 +36,17 @@ test-badgerdb:
 	@echo "--> Running go test"
 	@go test $(PACKAGES) -tags badgerdb -v
 
+test-remotedb:
+	@echo "--> Running go test"
+	@go test $(PACKAGES) -tags goleveldb,remotedb -v
+
 test-all:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb -v
+	@go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb -v
 
 test-all-docker:
 	@echo "--> Running go test"
-	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb -v
+	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb -v
 .PHONY: test-all-docker
 
 lint:
