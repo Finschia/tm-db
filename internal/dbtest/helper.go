@@ -106,129 +106,124 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 
 	itr, err := db.Iterator(nil, nil)
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")
+	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")
 
 	ritr, err := db.ReverseIterator(nil, nil)
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator")
+	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator")
 
 	itr, err = db.Iterator(nil, Int642Bytes(0))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64(nil), "forward iterator to 0")
+	verifyAndCloseIterator(t, itr, []int64(nil), "forward iterator to 0")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(10), nil)
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64(nil), "reverse iterator from 10 (ex)")
+	verifyAndCloseIterator(t, ritr, []int64(nil), "reverse iterator from 10 (ex)")
 
 	itr, err = db.Iterator(Int642Bytes(0), nil)
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator from 0")
+	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator from 0")
 
 	itr, err = db.Iterator(Int642Bytes(1), nil)
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator from 1")
+	verifyAndCloseIterator(t, itr, []int64{1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator from 1")
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(10))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 10 (ex)")
+	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 10 (ex)")
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(9))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 9 (ex)")
+	verifyAndCloseIterator(t, ritr, []int64{8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 9 (ex)")
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(8))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 8 (ex)")
+	verifyAndCloseIterator(t, ritr, []int64{7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 8 (ex)")
 
 	itr, err = db.Iterator(Int642Bytes(5), Int642Bytes(6))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{5}, "forward iterator from 5 to 6")
+	verifyAndCloseIterator(t, itr, []int64{5}, "forward iterator from 5 to 6")
 
 	itr, err = db.Iterator(Int642Bytes(5), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{5}, "forward iterator from 5 to 7")
+	verifyAndCloseIterator(t, itr, []int64{5}, "forward iterator from 5 to 7")
 
 	itr, err = db.Iterator(Int642Bytes(5), Int642Bytes(8))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{5, 7}, "forward iterator from 5 to 8")
+	verifyAndCloseIterator(t, itr, []int64{5, 7}, "forward iterator from 5 to 8")
 
 	itr, err = db.Iterator(Int642Bytes(6), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64(nil), "forward iterator from 6 to 7")
+	verifyAndCloseIterator(t, itr, []int64(nil), "forward iterator from 6 to 7")
 
 	itr, err = db.Iterator(Int642Bytes(6), Int642Bytes(8))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{7}, "forward iterator from 6 to 8")
+	verifyAndCloseIterator(t, itr, []int64{7}, "forward iterator from 6 to 8")
 
 	itr, err = db.Iterator(Int642Bytes(7), Int642Bytes(8))
 	require.NoError(t, err)
-	verifyIterator(t, itr, []int64{7}, "forward iterator from 7 to 8")
+	verifyAndCloseIterator(t, itr, []int64{7}, "forward iterator from 7 to 8")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(5))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{4}, "reverse iterator from 5 (ex) to 4")
+	verifyAndCloseIterator(t, ritr, []int64{4}, "reverse iterator from 5 (ex) to 4")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(6))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{5, 4}, "reverse iterator from 6 (ex) to 4")
+	verifyAndCloseIterator(t, ritr, []int64{5, 4}, "reverse iterator from 6 (ex) to 4")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{5, 4}, "reverse iterator from 7 (ex) to 4")
+	verifyAndCloseIterator(t, ritr, []int64{5, 4}, "reverse iterator from 7 (ex) to 4")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(5), Int642Bytes(6))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{5}, "reverse iterator from 6 (ex) to 5")
+	verifyAndCloseIterator(t, ritr, []int64{5}, "reverse iterator from 6 (ex) to 5")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(5), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{5}, "reverse iterator from 7 (ex) to 5")
+	verifyAndCloseIterator(t, ritr, []int64{5}, "reverse iterator from 7 (ex) to 5")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(6), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64(nil), "reverse iterator from 7 (ex) to 6")
+	verifyAndCloseIterator(t, ritr, []int64(nil), "reverse iterator from 7 (ex) to 6")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(10), nil)
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64(nil), "reverse iterator to 10")
+	verifyAndCloseIterator(t, ritr, []int64(nil), "reverse iterator to 10")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(6), nil)
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{9, 8, 7}, "reverse iterator to 6")
+	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7}, "reverse iterator to 6")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(5), nil)
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{9, 8, 7, 5}, "reverse iterator to 5")
+	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7, 5}, "reverse iterator to 5")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(8), Int642Bytes(9))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{8}, "reverse iterator from 9 (ex) to 8")
+	verifyAndCloseIterator(t, ritr, []int64{8}, "reverse iterator from 9 (ex) to 8")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(2), Int642Bytes(4))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64{3, 2}, "reverse iterator from 4 (ex) to 2")
+	verifyAndCloseIterator(t, ritr, []int64{3, 2}, "reverse iterator from 4 (ex) to 2")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(2))
 	require.NoError(t, err)
-	verifyIterator(t, ritr, []int64(nil), "reverse iterator from 2 (ex) to 4")
-
-	// TODO
-	// Ensure that the iterators don't panic with an empty database.
-	// name2, dir2 := NewTestName(fmt.Sprintf("test_backend_%s", backend))
-	// db2, err := NewDB(name2, backend, dir2)
-	// defer CleanupDB(db2, name2, dir2)
-	// require.NoError(t, err)
-	//
-	// itr, err = db2.Iterator(nil, nil)
-	// require.NoError(t, err)
-	// verifyIterator(t, itr, nil, "forward iterator with empty db")
-	//
-	// ritr, err = db2.ReverseIterator(nil, nil)
-	// require.NoError(t, err)
-	// verifyIterator(t, ritr, nil, "reverse iterator with empty db")
+	verifyAndCloseIterator(t, ritr, []int64(nil), "reverse iterator from 2 (ex) to 4")
 }
 
-func verifyIterator(t *testing.T, itr tmdb.Iterator, expected []int64, msg string) {
+func TestDBEmptyIterator(t *testing.T, db tmdb.DB) {
+	itr, err := db.Iterator(nil, nil)
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, nil, "forward iterator with empty db")
+
+	ritr, err := db.ReverseIterator(nil, nil)
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, ritr, nil, "reverse iterator with empty db")
+}
+
+func verifyAndCloseIterator(t *testing.T, itr tmdb.Iterator, expected []int64, msg string) {
 	var list []int64
 	for itr.Valid() {
 		key := itr.Key()
@@ -236,6 +231,9 @@ func verifyIterator(t *testing.T, itr tmdb.Iterator, expected []int64, msg strin
 		itr.Next()
 	}
 	assert.Equal(t, expected, list, msg)
+
+	err := itr.Close()
+	require.NoError(t, err)
 }
 
 func TestDBBatch(t *testing.T, db tmdb.DB) {

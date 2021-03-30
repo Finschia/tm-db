@@ -76,6 +76,10 @@ bench-remotedb:
 bench-all:
 	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
 
+bench-all-docker:
+	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
+.PHONY: bench-all-docker
+
 lint:
 	@echo "--> Running linter"
 	@golangci-lint run

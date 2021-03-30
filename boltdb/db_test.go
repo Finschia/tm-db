@@ -26,25 +26,32 @@ func TestBoltDBStats(t *testing.T) {
 	assert.NotEmpty(t, db.Stats())
 }
 
-// TODO fix stall at closing db
-// func TestBoltDBIterator(t *testing.T) {
-// 	name, dir := dbtest.NewTestName("boltdb")
-// 	db, err := NewDB(name, dir)
-// 	defer dbtest.CleanupDB(db, name, dir)
-// 	require.NoError(t, err)
-//
-// 	dbtest.TestDBIterator(t, db)
-// }
+func TestBoltDBIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
 
-// TODO fix failure of test
-// func TestBoltDBBatch(t *testing.T) {
-// 	name, dir := dbtest.NewTestName("boltdb")
-// 	db, err := NewDB(name, dir)
-// 	defer dbtest.CleanupDB(db, name, dir)
-// 	require.NoError(t, err)
-//
-// 	dbtest.TestDBBatch(t, db)
-// }
+	dbtest.TestDBIterator(t, db)
+}
+
+func TestBoltDBEmptyIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBEmptyIterator(t, db)
+}
+
+func TestBoltDBBatch(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBBatch(t, db)
+}
 
 // TODO fix stall
 // func BenchmarkBoltDBRangeScans1M(b *testing.B) {

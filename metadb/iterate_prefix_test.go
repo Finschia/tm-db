@@ -2,25 +2,22 @@ package metadb
 
 import (
 	"fmt"
-	"io/ioutil"
-	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	tmdb "github.com/line/tm-db/v2"
 	"github.com/line/tm-db/v2/internal/dbtest"
-	"github.com/line/tm-db/v2/prefixdb"
+	"github.com/stretchr/testify/require"
 )
 
 // Empty iterator for empty db.
 func TestPrefixIteratorNoMatchNil(t *testing.T) {
 	for backend := range backends {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
-			db, dir := newTempDB(t, backend)
-			defer os.RemoveAll(dir)
-			itr, err := prefixdb.IteratePrefix(db, []byte("2"))
+			db, name, dir := newTempDB(t, backend)
+			defer dbtest.CleanupDB(db, name, dir)
+
+			itr, err := IteratePrefix(db, []byte("2"))
 			require.NoError(t, err)
+			defer itr.Close()
 
 			dbtest.Invalid(t, itr)
 		})
@@ -36,10 +33,13 @@ func TestPrefixIteratorNoMatch1(t *testing.T) {
 		}
 
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
-			db, dir := newTempDB(t, backend)
-			defer os.RemoveAll(dir)
-			itr, err := prefixdb.IteratePrefix(db, []byte("2"))
+			db, name, dir := newTempDB(t, backend)
+			defer dbtest.CleanupDB(db, name, dir)
+
+			itr, err := IteratePrefix(db, []byte("2"))
 			require.NoError(t, err)
+			defer itr.Close()
+
 			err = db.SetSync([]byte("1"), []byte("value_1"))
 			require.NoError(t, err)
 
@@ -52,12 +52,15 @@ func TestPrefixIteratorNoMatch1(t *testing.T) {
 func TestPrefixIteratorNoMatch2(t *testing.T) {
 	for backend := range backends {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
-			db, dir := newTempDB(t, backend)
-			defer os.RemoveAll(dir)
+			db, name, dir := newTempDB(t, backend)
+			defer dbtest.CleanupDB(db, name, dir)
+
 			err := db.SetSync([]byte("3"), []byte("value_3"))
 			require.NoError(t, err)
-			itr, err := prefixdb.IteratePrefix(db, []byte("4"))
+
+			itr, err := IteratePrefix(db, []byte("4"))
 			require.NoError(t, err)
+			defer itr.Close()
 
 			dbtest.Invalid(t, itr)
 		})
@@ -68,12 +71,15 @@ func TestPrefixIteratorNoMatch2(t *testing.T) {
 func TestPrefixIteratorMatch1(t *testing.T) {
 	for backend := range backends {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
-			db, dir := newTempDB(t, backend)
-			defer os.RemoveAll(dir)
+			db, name, dir := newTempDB(t, backend)
+			defer dbtest.CleanupDB(db, name, dir)
+
 			err := db.SetSync([]byte("2"), []byte("value_2"))
 			require.NoError(t, err)
-			itr, err := prefixdb.IteratePrefix(db, []byte("2"))
+
+			itr, err := IteratePrefix(db, []byte("2"))
 			require.NoError(t, err)
+			defer itr.Close()
 
 			dbtest.Valid(t, itr, true)
 			dbtest.Item(t, itr, []byte("2"), []byte("value_2"))
@@ -89,8 +95,8 @@ func TestPrefixIteratorMatch1(t *testing.T) {
 func TestPrefixIteratorMatches1N(t *testing.T) {
 	for backend := range backends {
 		t.Run(fmt.Sprintf("Prefix w/ backend %s", backend), func(t *testing.T) {
-			db, dir := newTempDB(t, backend)
-			defer os.RemoveAll(dir)
+			db, name, dir := newTempDB(t, backend)
+			defer dbtest.CleanupDB(db, name, dir)
 
 			// prefixed
 			err := db.SetSync([]byte("a/1"), []byte("value_1"))
@@ -107,8 +113,9 @@ func TestPrefixIteratorMatches1N(t *testing.T) {
 			require.NoError(t, err)
 			err = db.SetSync([]byte("abcdefg"), []byte("value_3"))
 			require.NoError(t, err)
-			itr, err := prefixdb.IteratePrefix(db, []byte("a/"))
+			itr, err := IteratePrefix(db, []byte("a/"))
 			require.NoError(t, err)
+			defer itr.Close()
 
 			dbtest.Valid(t, itr, true)
 			dbtest.Item(t, itr, []byte("a/1"), []byte("value_1"))
@@ -122,12 +129,4 @@ func TestPrefixIteratorMatches1N(t *testing.T) {
 			dbtest.Invalid(t, itr)
 		})
 	}
-}
-
-func newTempDB(t *testing.T, backend BackendType) (db tmdb.DB, dbDir string) {
-	dirname, err := ioutil.TempDir("", "db_common_test")
-	require.NoError(t, err)
-	db, err = NewDB("testdb", backend, dirname)
-	require.NoError(t, err)
-	return db, dirname
 }
