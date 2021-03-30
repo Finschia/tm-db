@@ -14,31 +14,31 @@ test:
 
 test-memdb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags memdb -v
+	@go test ./memdb/... -tags memdb -v
 
 test-goleveldb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags goleveldb -v
+	@go test ./goleveldb/... -tags goleveldb -v
 
 test-cleveldb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags cleveldb -v
+	@go test ./cleveldb/... -tags cleveldb -v
 
 test-rocksdb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags rocksdb -v
+	@go test ./rocksdb/... -tags rocksdb -v
 
 test-boltdb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags boltdb -v
+	@go test ./boltdb/... -tags boltdb -v
 
 test-badgerdb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags badgerdb -v
+	@go test ./badgerdb/... -tags badgerdb -v
 
 test-remotedb:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags goleveldb,remotedb -v
+	@go test ./remotedb/... -tags goleveldb,remotedb -v
 
 test-all:
 	@echo "--> Running go test"
@@ -53,25 +53,25 @@ bench:
 	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb
 
 bench-memdb:
-	@go test -bench=. $(PACKAGES) -tags memdb
+	@go test -bench=. ./memdb/... -tags memdb
 
 bench-goleveldb:
-	@go test -bench=. $(PACKAGES) -tags goleveldb
+	@go test -bench=. ./goleveldb/... -tags goleveldb -v
 
 bench-cleveldb:
-	@go test -bench=. $(PACKAGES) -tags cleveldb
+	@go test -bench=. ./cleveldb/... -tags=gcc,cleveldb
 
 bench-rocksdb:
-	@go test -bench=. $(PACKAGES) -tags rocksdb
+	@go test -bench=. ./rocksdb/... -tags rocksdb
 
 bench-boltdb:
-	@go test -bench=. $(PACKAGES) -tags boltdb
+	@go test -bench=. ./boltdb/... -tags boltdb
 
 bench-badgerdb:
-	@go test -bench=. $(PACKAGES) -tags badgerdb
+	@go test -bench=. ./badgerdb/... -tags badgerdb
 
 bench-remotedb:
-	@go test -bench=. $(PACKAGES) -tags goleveldb,remotedb
+	@go test -bench=. ./remotedb/... -tags goleveldb,remotedb
 
 bench-all:
 	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
