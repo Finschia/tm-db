@@ -130,18 +130,15 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(10))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 10 (ex)")
+	verifyIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 10 (ex)")
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(9))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 9 (ex)")
+	verifyIterator(t, ritr, []int64{8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 9 (ex)")
 
 	ritr, err = db.ReverseIterator(nil, Int642Bytes(8))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 8 (ex)")
+	verifyIterator(t, ritr, []int64{7, 5, 4, 3, 2, 1, 0}, "reverse iterator from 8 (ex)")
 
 	itr, err = db.Iterator(Int642Bytes(5), Int642Bytes(6))
 	require.NoError(t, err)
@@ -173,13 +170,11 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(6))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{5, 4}, "reverse iterator from 6 (ex) to 4")
+	verifyIterator(t, ritr, []int64{5, 4}, "reverse iterator from 6 (ex) to 4")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{5, 4}, "reverse iterator from 7 (ex) to 4")
+	verifyIterator(t, ritr, []int64{5, 4}, "reverse iterator from 7 (ex) to 4")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(5), Int642Bytes(6))
 	require.NoError(t, err)
@@ -191,8 +186,7 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 
 	ritr, err = db.ReverseIterator(Int642Bytes(6), Int642Bytes(7))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64(nil), "reverse iterator from 7 (ex) to 6")
+	verifyIterator(t, ritr, []int64(nil), "reverse iterator from 7 (ex) to 6")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(10), nil)
 	require.NoError(t, err)
@@ -212,13 +206,11 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 
 	ritr, err = db.ReverseIterator(Int642Bytes(2), Int642Bytes(4))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64{3, 2}, "reverse iterator from 4 (ex) to 2")
+	verifyIterator(t, ritr, []int64{3, 2}, "reverse iterator from 4 (ex) to 2")
 
 	ritr, err = db.ReverseIterator(Int642Bytes(4), Int642Bytes(2))
 	require.NoError(t, err)
-	verifyIterator(t, ritr,
-		[]int64(nil), "reverse iterator from 2 (ex) to 4")
+	verifyIterator(t, ritr, []int64(nil), "reverse iterator from 2 (ex) to 4")
 
 	// TODO
 	// Ensure that the iterators don't panic with an empty database.
