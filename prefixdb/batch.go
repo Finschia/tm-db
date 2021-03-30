@@ -2,6 +2,7 @@ package prefixdb
 
 import (
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 type prefixDBBatch struct {
@@ -26,7 +27,7 @@ func (pb prefixDBBatch) Set(key, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	pkey := tmdb.Concat(pb.prefix, key)
+	pkey := util.Concat(pb.prefix, key)
 	return pb.source.Set(pkey, value)
 }
 
@@ -35,7 +36,7 @@ func (pb prefixDBBatch) Delete(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	pkey := tmdb.Concat(pb.prefix, key)
+	pkey := util.Concat(pb.prefix, key)
 	return pb.source.Delete(pkey)
 }
 

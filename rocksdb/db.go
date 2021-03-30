@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"github.com/tecbot/gorocksdb"
 )
 
@@ -20,7 +21,7 @@ type RocksDB struct {
 var _ tmdb.DB = (*RocksDB)(nil)
 
 func NewDB(name string, dir string) (*RocksDB, error) {
-	err := tmdb.MakePath(dir)
+	err := util.MakePath(dir)
 	if err != nil {
 		return nil, err
 	}

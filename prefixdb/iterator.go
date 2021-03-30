@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 // IteratePrefix is a convenience function for iterating over a key domain
@@ -15,8 +16,8 @@ func IteratePrefix(db tmdb.DB, prefix []byte) (tmdb.Iterator, error) {
 		start = nil
 		end = nil
 	} else {
-		start = tmdb.Cp(prefix)
-		end = tmdb.CpIncr(prefix)
+		start = util.Cp(prefix)
+		end = util.CpIncr(prefix)
 	}
 	itr, err := db.Iterator(start, end)
 	if err != nil {
