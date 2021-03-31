@@ -138,5 +138,5 @@ func (b *BadgerDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 func (b *BadgerDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	opts := badger.DefaultIteratorOptions
 	opts.Reverse = true
-	return newBadgerDBIterator(b, start, end, opts)
+	return newBadgerDBIterator(b, end, start, opts)
 }
