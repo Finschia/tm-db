@@ -1,14 +1,18 @@
 package badgerdb
 
 import (
-	"bytes"
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/dgraph-io/badger/v2"
 	tmdb "github.com/line/tm-db/v2"
 )
+
+type BadgerDB struct {
+	db *badger.DB
+}
+
+var _ tmdb.DB = (*BadgerDB)(nil)
 
 // NewDB creates a Badger key-value store backed to the
 // directory dir supplied. If dir does not exist, it will be created.
@@ -36,12 +40,6 @@ func NewDBWithOptions(opts badger.Options) (*BadgerDB, error) {
 	}
 	return &BadgerDB{db: db}, nil
 }
-
-type BadgerDB struct {
-	db *badger.DB
-}
-
-var _ tmdb.DB = (*BadgerDB)(nil)
 
 func (b *BadgerDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
@@ -74,7 +72,7 @@ func (b *BadgerDB) Has(key []byte) (bool, error) {
 		if err != nil && err != badger.ErrKeyNotFound {
 			return err
 		}
-		found = (err != badger.ErrKeyNotFound)
+		found = err != badger.ErrKeyNotFound
 		return nil
 	})
 	return found, err
@@ -124,164 +122,21 @@ func (b *BadgerDB) Print() error {
 	return nil
 }
 
-func (b *BadgerDB) iteratorOpts(start, end []byte, opts badger.IteratorOptions) (*badgerDBIterator, error) {
-	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
-		return nil, tmdb.ErrKeyEmpty
-	}
-	txn := b.db.NewTransaction(false)
-	iter := txn.NewIterator(opts)
-	iter.Rewind()
-	iter.Seek(start)
-	if opts.Reverse && iter.Valid() && bytes.Equal(iter.Item().Key(), start) {
-		// If we're going in reverse, our starting point was "end",
-		// which is exclusive.
-		iter.Next()
-	}
-	return &badgerDBIterator{
-		reverse: opts.Reverse,
-		start:   start,
-		end:     end,
-
-		txn:  txn,
-		iter: iter,
-	}, nil
-}
-
-func (b *BadgerDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
-	opts := badger.DefaultIteratorOptions
-	return b.iteratorOpts(start, end, opts)
-}
-
-func (b *BadgerDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
-	opts := badger.DefaultIteratorOptions
-	opts.Reverse = true
-	return b.iteratorOpts(end, start, opts)
-}
-
 func (b *BadgerDB) Stats() map[string]string {
 	return nil
 }
 
 func (b *BadgerDB) NewBatch() tmdb.Batch {
-	wb := &badgerDBBatch{
-		db:         b.db,
-		wb:         b.db.NewWriteBatch(),
-		firstFlush: make(chan struct{}, 1),
-	}
-	wb.firstFlush <- struct{}{}
-	return wb
+	return newBadgerDBBatch(b)
 }
 
-var _ tmdb.Batch = (*badgerDBBatch)(nil)
-
-type badgerDBBatch struct {
-	db *badger.DB
-	wb *badger.WriteBatch
-
-	// Calling db.Flush twice panics, so we must keep track of whether we've
-	// flushed already on our own. If Write can receive from the firstFlush
-	// channel, then it's the first and only Flush call we should do.
-	//
-	// Upstream bug report:
-	// https://github.com/dgraph-io/badger/issues/1394
-	firstFlush chan struct{}
+func (b *BadgerDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
+	opts := badger.DefaultIteratorOptions
+	return newBadgerDBIterator(b, start, end, opts)
 }
 
-func (b *badgerDBBatch) Set(key, value []byte) error {
-	if len(key) == 0 {
-		return tmdb.ErrKeyEmpty
-	}
-	if value == nil {
-		return tmdb.ErrValueNil
-	}
-	return b.wb.Set(key, value)
-}
-
-func (b *badgerDBBatch) Delete(key []byte) error {
-	if len(key) == 0 {
-		return tmdb.ErrKeyEmpty
-	}
-	return b.wb.Delete(key)
-}
-
-func (b *badgerDBBatch) Write() error {
-	select {
-	case <-b.firstFlush:
-		return b.wb.Flush()
-	default:
-		return fmt.Errorf("batch already flushed")
-	}
-}
-
-func (b *badgerDBBatch) WriteSync() error {
-	return withSync(b.db, b.Write())
-}
-
-func (b *badgerDBBatch) Close() error {
-	select {
-	case <-b.firstFlush: // a Flush after Cancel panics too
-	default:
-	}
-	b.wb.Cancel()
-	return nil
-}
-
-type badgerDBIterator struct {
-	reverse    bool
-	start, end []byte
-
-	txn  *badger.Txn
-	iter *badger.Iterator
-
-	lastErr error
-}
-
-func (i *badgerDBIterator) Close() error {
-	i.iter.Close()
-	i.txn.Discard()
-	return nil
-}
-
-func (i *badgerDBIterator) Domain() (start, end []byte) { return i.start, i.end }
-func (i *badgerDBIterator) Error() error                { return i.lastErr }
-
-func (i *badgerDBIterator) Next() {
-	if !i.Valid() {
-		panic("iterator is invalid")
-	}
-	i.iter.Next()
-}
-
-func (i *badgerDBIterator) Valid() bool {
-	if !i.iter.Valid() {
-		return false
-	}
-	if len(i.end) > 0 {
-		key := i.iter.Item().Key()
-		if c := bytes.Compare(key, i.end); (!i.reverse && c >= 0) || (i.reverse && c < 0) {
-			// We're at the end key, or past the end.
-			return false
-		}
-	}
-	return true
-}
-
-func (i *badgerDBIterator) Key() []byte {
-	if !i.Valid() {
-		panic("iterator is invalid")
-	}
-	// Note that we don't use KeyCopy, so this is only valid until the next
-	// call to Next.
-	return i.iter.Item().KeyCopy(nil)
-}
-
-func (i *badgerDBIterator) Value() []byte {
-	if !i.Valid() {
-		panic("iterator is invalid")
-	}
-	val, err := i.iter.Item().ValueCopy(nil)
-	if err != nil {
-		i.lastErr = err
-	}
-	return val
+func (b *BadgerDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
+	opts := badger.DefaultIteratorOptions
+	opts.Reverse = true
+	return newBadgerDBIterator(b, start, end, opts)
 }
