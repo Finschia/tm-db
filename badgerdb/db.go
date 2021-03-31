@@ -1,11 +1,11 @@
 package badgerdb
 
 import (
-	"os"
 	"path/filepath"
 
 	"github.com/dgraph-io/badger/v2"
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 type BadgerDB struct {
@@ -21,7 +21,7 @@ func NewDB(dbName, dir string) (*BadgerDB, error) {
 	// the final directory to use for the database.
 	path := filepath.Join(dir, dbName)
 
-	if err := os.MkdirAll(path, 0755); err != nil {
+	if err := util.MakePath(path); err != nil {
 		return nil, err
 	}
 	opts := badger.DefaultOptions(path)
