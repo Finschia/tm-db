@@ -2,11 +2,11 @@ package rocksdb
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"runtime"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"github.com/tecbot/gorocksdb"
 )
 
@@ -21,7 +21,7 @@ type RocksDB struct {
 var _ tmdb.DB = (*RocksDB)(nil)
 
 func NewDB(name string, dir string) (*RocksDB, error) {
-	err := os.MkdirAll(dir, 0755)
+	err := util.MakePath(dir)
 	if err != nil {
 		return nil, err
 	}

@@ -1,9 +1,10 @@
-package db
+package util
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func BenchmarkConcat(b *testing.B) {

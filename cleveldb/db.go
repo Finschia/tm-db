@@ -2,12 +2,11 @@ package cleveldb
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/jmhodges/levigo"
-
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 // CLevelDB uses the C LevelDB database via a Go wrapper.
@@ -22,7 +21,7 @@ var _ tmdb.DB = (*CLevelDB)(nil)
 
 // New creates a new CLevelDB.
 func NewDB(name string, dir string) (*CLevelDB, error) {
-	err := os.MkdirAll(dir, 0755)
+	err := util.MakePath(dir)
 	if err != nil {
 		return nil, err
 	}

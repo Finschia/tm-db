@@ -1,33 +1,33 @@
-// +build cleveldb
+// +build badgerdb
 
-package cleveldb
+package badgerdb
 
 import (
 	"testing"
 
 	"github.com/line/tm-db/v2/internal/dbtest"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestCLevelDBNewDB(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func TestBadgerDBNewDB(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
 }
 
-func TestCLevelDBStats(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
-	db, err := NewDB(name, dir)
-	defer dbtest.CleanupDB(db, name, dir)
-	require.NoError(t, err)
+// TODO implement badgerDB.Status()
+// func TestBadgerDBStats(t *testing.T) {
+// 	name, dir := dbtest.NewTestName("badgerdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(t, err)
+//
+// 	assert.NotEmpty(t, db.Stats())
+// }
 
-	assert.NotEmpty(t, db.Stats())
-}
-
-func TestCLevelDBIterator(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func TestBadgerDBIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -35,8 +35,8 @@ func TestCLevelDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
-func TestCLevelDBEmptyIterator(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func TestBadgerDBEmptyIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -44,8 +44,8 @@ func TestCLevelDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
-func TestCLevelDBBatch(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func TestBadgerDBBatch(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -53,8 +53,8 @@ func TestCLevelDBBatch(t *testing.T) {
 	dbtest.TestDBBatch(t, db)
 }
 
-func BenchmarkCLevelDBRangeScans1M(b *testing.B) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func BenchmarkBadgerDBRangeScans1M(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)
@@ -62,8 +62,8 @@ func BenchmarkCLevelDBRangeScans1M(b *testing.B) {
 	dbtest.BenchmarkRangeScans(b, db, int64(1e6))
 }
 
-func BenchmarkCLevelDBRangeScans10M(b *testing.B) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func BenchmarkBadgerDBRangeScans10M(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)
@@ -71,8 +71,8 @@ func BenchmarkCLevelDBRangeScans10M(b *testing.B) {
 	dbtest.BenchmarkRangeScans(b, db, int64(10e6))
 }
 
-func BenchmarkCLevelDBRandomReadsWrites(b *testing.B) {
-	name, dir := dbtest.NewTestName("cleveldb")
+func BenchmarkBadgerDBRandomReadsWrites(b *testing.B) {
+	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(b, err)

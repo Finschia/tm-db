@@ -4,6 +4,7 @@ import (
 	"bytes"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
 )
 
@@ -99,7 +100,7 @@ func (itr *goLevelDBIterator) Key() []byte {
 	// Key returns a copy of the current key.
 	// See https://github.com/syndtr/goleveldb/blob/52c212e6c196a1404ea59592d3f1c227c9f034b2/leveldb/iterator/iter.go#L88
 	itr.assertIsValid()
-	return tmdb.Cp(itr.source.Key())
+	return util.Cp(itr.source.Key())
 }
 
 // Value implements Iterator.
@@ -107,7 +108,7 @@ func (itr *goLevelDBIterator) Value() []byte {
 	// Value returns a copy of the current value.
 	// See https://github.com/syndtr/goleveldb/blob/52c212e6c196a1404ea59592d3f1c227c9f034b2/leveldb/iterator/iter.go#L88
 	itr.assertIsValid()
-	return tmdb.Cp(itr.source.Value())
+	return util.Cp(itr.source.Value())
 }
 
 // Next implements Iterator.

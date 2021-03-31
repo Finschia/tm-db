@@ -3,34 +3,81 @@
 package boltdb
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/line/tm-db/v2/internal/dbtest"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestBoltDBNewBoltDB(t *testing.T) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	dir := os.TempDir()
-	defer dbtest.CleanupDBDir(dir, name)
-
+func TestBoltDBNewDB(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
 	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
-	db.Close()
 }
 
+func TestBoltDBStats(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	assert.NotEmpty(t, db.Stats())
+}
+
+func TestBoltDBIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBIterator(t, db)
+}
+
+func TestBoltDBEmptyIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBEmptyIterator(t, db)
+}
+
+func TestBoltDBBatch(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBBatch(t, db)
+}
+
+// TODO fix stall
+// func BenchmarkBoltDBRangeScans1M(b *testing.B) {
+// 	name, dir := dbtest.NewTestName("boltdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(b, err)
+//
+// 	dbtest.BenchmarkRangeScans(b, db, int64(1e6))
+// }
+
+// TODO fix stall
+// func BenchmarkBoltDBRangeScans10M(b *testing.B) {
+// 	name, dir := dbtest.NewTestName("boltdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(b, err)
+//
+// 	dbtest.BenchmarkRangeScans(b, db, int64(10e6))
+// }
+
 func BenchmarkBoltDBRandomReadsWrites(b *testing.B) {
-	name := fmt.Sprintf("test_%x", dbtest.RandStr(12))
-	db, err := NewDB(name, "")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer func() {
-		db.Close()
-		dbtest.CleanupDBDir("", name)
-	}()
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(b, err)
 
 	dbtest.BenchmarkRandomReadsWrites(b, db)
 }

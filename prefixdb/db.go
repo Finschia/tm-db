@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 // PrefixDB wraps a namespace of another database as a logical database.
@@ -119,11 +120,11 @@ func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	defer pdb.mtx.Unlock()
 
 	var pstart, pend []byte
-	pstart = tmdb.Concat(pdb.prefix, start)
+	pstart = util.Concat(pdb.prefix, start)
 	if end == nil {
-		pend = tmdb.CpIncr(pdb.prefix)
+		pend = util.CpIncr(pdb.prefix)
 	} else {
-		pend = tmdb.Concat(pdb.prefix, end)
+		pend = util.Concat(pdb.prefix, end)
 	}
 	itr, err := pdb.db.Iterator(pstart, pend)
 	if err != nil {
@@ -142,11 +143,11 @@ func (pdb *PrefixDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	defer pdb.mtx.Unlock()
 
 	var pstart, pend []byte
-	pstart = tmdb.Concat(pdb.prefix, start)
+	pstart = util.Concat(pdb.prefix, start)
 	if end == nil {
-		pend = tmdb.CpIncr(pdb.prefix)
+		pend = util.CpIncr(pdb.prefix)
 	} else {
-		pend = tmdb.Concat(pdb.prefix, end)
+		pend = util.Concat(pdb.prefix, end)
 	}
 	ritr, err := pdb.db.ReverseIterator(pstart, pend)
 	if err != nil {
@@ -202,5 +203,5 @@ func (pdb *PrefixDB) Stats() map[string]string {
 }
 
 func (pdb *PrefixDB) prefixed(key []byte) []byte {
-	return tmdb.Concat(pdb.prefix, key)
+	return util.Concat(pdb.prefix, key)
 }

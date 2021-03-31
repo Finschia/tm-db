@@ -6,7 +6,43 @@ import (
 	"testing"
 
 	"github.com/line/tm-db/v2/internal/dbtest"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestMemDBNewDB(t *testing.T) {
+	db := NewDB()
+	require.NotNil(t, db)
+	db.Close()
+}
+
+func TestMemDBStats(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	assert.NotEmpty(t, db.Stats())
+}
+
+func TestMemDBIterator(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestDBIterator(t, db)
+}
+
+func TestMemDBEmptyIterator(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestDBEmptyIterator(t, db)
+}
+
+func TestMemDBBatch(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestDBBatch(t, db)
+}
 
 func BenchmarkMemDBRangeScans1M(b *testing.B) {
 	db := NewDB()
