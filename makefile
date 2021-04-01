@@ -59,7 +59,7 @@ bench-goleveldb:
 	@go test -bench=. ./goleveldb/... -tags goleveldb -v
 
 bench-cleveldb:
-	@go test -bench=. ./cleveldb/... -tags=gcc,cleveldb
+	@go test -bench=. ./cleveldb/... -tags cleveldb
 
 bench-rocksdb:
 	@go test -bench=. ./rocksdb/... -tags rocksdb
