@@ -44,6 +44,15 @@ func TestCLevelDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
+func TestCLevelDBPrefixIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("cleveldb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBPrefixIterator(t, db)
+}
+
 func TestCLevelDBPrefixIteratorNoMatchNil(t *testing.T) {
 	name, dir := dbtest.NewTestName("cleveldb")
 	db, err := NewDB(name, dir)
