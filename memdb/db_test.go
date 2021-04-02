@@ -37,6 +37,48 @@ func TestMemDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
+func TestMemDBPrefixIterator(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestDBPrefixIterator(t, db)
+}
+
+func TestMemDBPrefixIteratorNoMatchNil(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestPrefixIteratorNoMatchNil(t, db)
+}
+
+func TestMemDBPrefixIteratorNoMatch1(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestPrefixIteratorNoMatch1(t, db)
+}
+
+func TestMemDBPrefixIteratorNoMatch2(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestPrefixIteratorNoMatch2(t, db)
+}
+
+func TestMemDBPrefixIteratorMatch1(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestPrefixIteratorMatch1(t, db)
+}
+
+func TestMemDBPrefixIteratorMatches1N(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestPrefixIteratorMatches1N(t, db)
+}
+
 func TestMemDBBatch(t *testing.T) {
 	db := NewDB()
 	defer db.Close()

@@ -136,7 +136,10 @@ func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (pdb *PrefixDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return pdb.Iterator(start, end)
 }
 
@@ -164,7 +167,10 @@ func (pdb *PrefixDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (pdb *PrefixDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return pdb.ReverseIterator(start, end)
 }
 

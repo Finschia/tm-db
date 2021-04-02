@@ -187,7 +187,10 @@ func (bdb *BoltDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (bdb *BoltDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return bdb.Iterator(start, end)
 }
 
@@ -205,6 +208,9 @@ func (bdb *BoltDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (bdb *BoltDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return bdb.ReverseIterator(start, end)
 }

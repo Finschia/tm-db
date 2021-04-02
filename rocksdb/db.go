@@ -189,7 +189,10 @@ func (db *RocksDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return db.Iterator(start, end)
 }
 
@@ -203,6 +206,9 @@ func (db *RocksDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return db.ReverseIterator(start, end)
 }

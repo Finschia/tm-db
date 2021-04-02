@@ -3,6 +3,8 @@ package util
 import (
 	"bytes"
 	"os"
+
+	tmdb "github.com/line/tm-db/v2"
 )
 
 func Cp(bz []byte) (ret []byte) {
@@ -66,7 +68,11 @@ func FileExists(filePath string) bool {
 	return !os.IsNotExist(err)
 }
 
-func PrefixRange(prefix []byte) (start, end []byte) {
+func PrefixRange(prefix []byte) (start, end []byte, err error) {
+	if prefix != nil && len(prefix) == 0 {
+		return nil, nil, tmdb.ErrKeyEmpty
+	}
+
 	if len(prefix) == 0 {
 		start = nil
 		end = nil
@@ -74,7 +80,7 @@ func PrefixRange(prefix []byte) (start, end []byte) {
 		start = Cp(prefix)
 		end = CpIncr(prefix)
 	}
-	return start, end
+	return start, end, nil
 }
 
 // Path

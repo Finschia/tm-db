@@ -44,6 +44,15 @@ func TestBadgerDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
+func TestBadgerDBPrefixIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBPrefixIterator(t, db)
+}
+
 func TestBadgerDBPrefixIteratorNoMatchNil(t *testing.T) {
 	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)

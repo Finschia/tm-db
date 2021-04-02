@@ -179,7 +179,10 @@ func (db *MemDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *MemDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return db.Iterator(start, end)
 }
 
@@ -193,6 +196,9 @@ func (db *MemDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *MemDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := util.PrefixRange(prefix)
+	start, end, err := util.PrefixRange(prefix)
+	if err != nil {
+		return nil, err
+	}
 	return db.ReverseIterator(start, end)
 }
