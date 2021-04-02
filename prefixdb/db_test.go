@@ -47,7 +47,6 @@ func TestPrefixDBIterator1(t *testing.T) {
 
 	itr, err := pdb.Iterator(nil, nil)
 	require.NoError(t, err)
-	dbtest.Domain(t, itr, nil, nil)
 	dbtest.Item(t, itr, []byte("1"), []byte("value1"))
 	dbtest.Next(t, itr, true)
 	dbtest.Item(t, itr, []byte("2"), []byte("value2"))
@@ -64,7 +63,6 @@ func TestPrefixDBReverseIterator1(t *testing.T) {
 
 	itr, err := pdb.ReverseIterator(nil, nil)
 	require.NoError(t, err)
-	dbtest.Domain(t, itr, nil, nil)
 	dbtest.Item(t, itr, []byte("3"), []byte("value3"))
 	dbtest.Next(t, itr, true)
 	dbtest.Item(t, itr, []byte("2"), []byte("value2"))
@@ -81,7 +79,6 @@ func TestPrefixDBReverseIterator5(t *testing.T) {
 
 	itr, err := pdb.ReverseIterator([]byte("1"), nil)
 	require.NoError(t, err)
-	dbtest.Domain(t, itr, []byte("1"), nil)
 	dbtest.Item(t, itr, []byte("3"), []byte("value3"))
 	dbtest.Next(t, itr, true)
 	dbtest.Item(t, itr, []byte("2"), []byte("value2"))
@@ -98,7 +95,6 @@ func TestPrefixDBReverseIterator6(t *testing.T) {
 
 	itr, err := pdb.ReverseIterator([]byte("2"), nil)
 	require.NoError(t, err)
-	dbtest.Domain(t, itr, []byte("2"), nil)
 	dbtest.Item(t, itr, []byte("3"), []byte("value3"))
 	dbtest.Next(t, itr, true)
 	dbtest.Item(t, itr, []byte("2"), []byte("value2"))
@@ -113,7 +109,6 @@ func TestPrefixDBReverseIterator7(t *testing.T) {
 
 	itr, err := pdb.ReverseIterator(nil, []byte("2"))
 	require.NoError(t, err)
-	dbtest.Domain(t, itr, nil, []byte("2"))
 	dbtest.Item(t, itr, []byte("1"), []byte("value1"))
 	dbtest.Next(t, itr, false)
 	dbtest.Invalid(t, itr)
