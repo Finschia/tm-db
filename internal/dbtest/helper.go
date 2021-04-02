@@ -217,6 +217,45 @@ func TestDBEmptyIterator(t *testing.T, db tmdb.DB) {
 	verifyAndCloseIterator(t, ritr, nil, "reverse iterator with empty db")
 }
 
+func TestDBPrefixIterator(t *testing.T, db tmdb.DB) {
+	for i := 0; i < 10; i++ {
+		if i != 6 { // but skip 6.
+			err := db.Set(Int642Bytes(int64(i)), []byte{})
+			require.NoError(t, err)
+		}
+	}
+
+	// Blank iterator keys should error
+	_, err := db.PrefixIterator([]byte{})
+	require.Equal(t, tmdb.ErrKeyEmpty, err)
+	_, err = db.ReversePrefixIterator([]byte{})
+	require.Equal(t, tmdb.ErrKeyEmpty, err)
+
+	itr, err := db.PrefixIterator(nil)
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")
+
+	ritr, err := db.ReversePrefixIterator(nil)
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator")
+
+	itr, err = db.PrefixIterator(Int642Bytes(0))
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, []int64{0}, "forward iterator with 0 prefix")
+
+	itr, err = db.ReversePrefixIterator(Int642Bytes(0))
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, []int64{0}, "reverse iterator with 0 prefix")
+
+	itr, err = db.PrefixIterator(Int642Bytes(6))
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, nil, "forward iterator with 6 prefix")
+
+	itr, err = db.ReversePrefixIterator(Int642Bytes(6))
+	require.NoError(t, err)
+	verifyAndCloseIterator(t, itr, nil, "reverse iterator with 6 prefix")
+}
+
 func verifyAndCloseIterator(t *testing.T, itr tmdb.Iterator, expected []int64, msg string) {
 	var list []int64
 	for itr.Valid() {

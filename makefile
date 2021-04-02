@@ -56,7 +56,7 @@ bench-memdb:
 	@go test -bench=. ./memdb/... -tags memdb
 
 bench-goleveldb:
-	@go test -bench=. ./goleveldb/... -tags goleveldb -v
+	@go test -bench=. ./goleveldb/... -tags goleveldb
 
 bench-cleveldb:
 	@go test -bench=. ./cleveldb/... -tags cleveldb

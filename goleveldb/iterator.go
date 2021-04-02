@@ -1,8 +1,6 @@
 package goleveldb
 
 import (
-	"bytes"
-
 	tmdb "github.com/line/tm-db/v2"
 	"github.com/line/tm-db/v2/internal/util"
 	"github.com/syndtr/goleveldb/leveldb/iterator"
@@ -10,84 +8,27 @@ import (
 
 type goLevelDBIterator struct {
 	source    iterator.Iterator
-	start     []byte
-	end       []byte
 	isReverse bool
-	isInvalid bool
 }
 
 var _ tmdb.Iterator = (*goLevelDBIterator)(nil)
 
-func newGoLevelDBIterator(source iterator.Iterator, start, end []byte, isReverse bool) *goLevelDBIterator {
-	if isReverse {
-		if end == nil {
-			source.Last()
-		} else {
-			valid := source.Seek(end)
-			if valid {
-				eoakey := source.Key() // end or after key
-				if bytes.Compare(end, eoakey) <= 0 {
-					source.Prev()
-				}
-			} else {
-				source.Last()
-			}
-		}
+func newGoLevelDBIterator(source iterator.Iterator, isReverse bool) *goLevelDBIterator {
+	if !isReverse {
+		source.First()
 	} else {
-		if start == nil {
-			source.First()
-		} else {
-			source.Seek(start)
-		}
+		source.Last()
 	}
+
 	return &goLevelDBIterator{
 		source:    source,
-		start:     start,
-		end:       end,
 		isReverse: isReverse,
-		isInvalid: false,
 	}
 }
 
 // Valid implements Iterator.
 func (itr *goLevelDBIterator) Valid() bool {
-
-	// Once invalid, forever invalid.
-	if itr.isInvalid {
-		return false
-	}
-
-	// If source errors, invalid.
-	if err := itr.Error(); err != nil {
-		itr.isInvalid = true
-		return false
-	}
-
-	// If source is invalid, invalid.
-	if !itr.source.Valid() {
-		itr.isInvalid = true
-		return false
-	}
-
-	// If key is end or past it, invalid.
-	var start = itr.start
-	var end = itr.end
-	var key = itr.source.Key()
-
-	if itr.isReverse {
-		if start != nil && bytes.Compare(key, start) < 0 {
-			itr.isInvalid = true
-			return false
-		}
-	} else {
-		if end != nil && bytes.Compare(end, key) <= 0 {
-			itr.isInvalid = true
-			return false
-		}
-	}
-
-	// Valid
-	return true
+	return itr.source.Valid()
 }
 
 // Key implements Iterator.
@@ -109,10 +50,10 @@ func (itr *goLevelDBIterator) Value() []byte {
 // Next implements Iterator.
 func (itr *goLevelDBIterator) Next() {
 	itr.assertIsValid()
-	if itr.isReverse {
-		itr.source.Prev()
-	} else {
+	if !itr.isReverse {
 		itr.source.Next()
+	} else {
+		itr.source.Prev()
 	}
 }
 
@@ -127,7 +68,7 @@ func (itr *goLevelDBIterator) Close() error {
 	return nil
 }
 
-func (itr goLevelDBIterator) assertIsValid() {
+func (itr *goLevelDBIterator) assertIsValid() {
 	if !itr.Valid() {
 		panic("iterator is invalid")
 	}

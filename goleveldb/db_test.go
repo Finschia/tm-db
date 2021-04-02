@@ -38,7 +38,7 @@ func TestGoLevelDBNewDBAndNewReadonlyDB(t *testing.T) {
 }
 
 func TestGoLevelDBStats(t *testing.T) {
-	name, dir := dbtest.NewTestName("cleveldb")
+	name, dir := dbtest.NewTestName("goleveldb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)
 	require.NoError(t, err)
@@ -62,6 +62,15 @@ func TestGoLevelDBEmptyIterator(t *testing.T) {
 	require.NoError(t, err)
 
 	dbtest.TestDBEmptyIterator(t, db)
+}
+
+func TestGoLevelDBPrefixIterator(t *testing.T) {
+	name, dir := dbtest.NewTestName("goleveldb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBPrefixIterator(t, db)
 }
 
 func TestGoLevelDBPrefixIteratorNoMatchNil(t *testing.T) {
