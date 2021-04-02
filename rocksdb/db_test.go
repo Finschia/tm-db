@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRocksDBBNewDB(t *testing.T) {
+func TestRocksDBNewDB(t *testing.T) {
 	name, dir := dbtest.NewTestName("rocksdb")
 	db, err := NewDB(name, dir)
 	defer dbtest.CleanupDB(db, name, dir)

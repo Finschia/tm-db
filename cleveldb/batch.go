@@ -11,6 +11,8 @@ type cLevelDBBatch struct {
 	batch *levigo.WriteBatch
 }
 
+var _ tmdb.Batch = (*cLevelDBBatch)(nil)
+
 func newCLevelDBBatch(db *CLevelDB) *cLevelDBBatch {
 	return &cLevelDBBatch{
 		db:    db,
