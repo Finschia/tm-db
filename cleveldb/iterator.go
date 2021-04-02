@@ -48,11 +48,6 @@ func newCLevelDBIterator(source *levigo.Iterator, start, end []byte, isReverse b
 	}
 }
 
-// Domain implements Iterator.
-func (itr *cLevelDBIterator) Domain() ([]byte, []byte) {
-	return itr.start, itr.end
-}
-
 // Valid implements Iterator.
 func (itr *cLevelDBIterator) Valid() bool {
 

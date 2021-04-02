@@ -102,11 +102,6 @@ func (i *memDBIterator) Close() error {
 	return nil
 }
 
-// Domain implements Iterator.
-func (i *memDBIterator) Domain() ([]byte, []byte) {
-	return i.start, i.end
-}
-
 // Valid implements Iterator.
 func (i *memDBIterator) Valid() bool {
 	return i.item != nil

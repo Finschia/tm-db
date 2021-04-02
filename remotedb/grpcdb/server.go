@@ -170,15 +170,10 @@ func (s *server) Iterator(query *protodb.Entity, dis protodb.DB_IteratorServer) 
 
 func (s *server) handleIterator(it db.Iterator, sendFunc func(*protodb.Iterator) error) error {
 	for it.Valid() {
-		start, end := it.Domain()
-		key := it.Key()
-		value := it.Value()
-
 		out := &protodb.Iterator{
-			Domain: &protodb.Domain{Start: start, End: end},
-			Valid:  it.Valid(),
-			Key:    key,
-			Value:  value,
+			Valid: it.Valid(),
+			Key:   it.Key(),
+			Value: it.Value(),
 		}
 		if err := sendFunc(out); err != nil {
 			return err

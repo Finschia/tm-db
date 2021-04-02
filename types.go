@@ -123,10 +123,6 @@ type Batch interface {
 //   ...
 // }
 type Iterator interface {
-	// Domain returns the start (inclusive) and end (exclusive) limits of the iterator.
-	// CONTRACT: start, end readonly []byte
-	Domain() (start []byte, end []byte)
-
 	// Valid returns whether the current iterator is valid. Once invalid, the Iterator remains
 	// invalid forever.
 	Valid() bool

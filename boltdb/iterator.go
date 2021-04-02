@@ -59,11 +59,6 @@ func newBoltDBIterator(tx *bbolt.Tx, start, end []byte, isReverse bool) *boltDBI
 	}
 }
 
-// Domain implements Iterator.
-func (itr *boltDBIterator) Domain() ([]byte, []byte) {
-	return itr.start, itr.end
-}
-
 // Valid implements Iterator.
 func (itr *boltDBIterator) Valid() bool {
 	if itr.isInvalid {

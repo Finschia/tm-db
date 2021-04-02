@@ -33,12 +33,6 @@ func NextPanics(t *testing.T, itr tmdb.Iterator) {
 	assert.Panics(t, func() { itr.Next() }, "checkNextPanics expected an error but didn't")
 }
 
-func Domain(t *testing.T, itr tmdb.Iterator, start, end []byte) {
-	ds, de := itr.Domain()
-	assert.Equal(t, start, ds, "checkDomain domain start incorrect")
-	assert.Equal(t, end, de, "checkDomain domain end incorrect")
-}
-
 func Item(t *testing.T, itr tmdb.Iterator, key []byte, value []byte) {
 	v := itr.Value()
 

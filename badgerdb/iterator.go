@@ -48,10 +48,6 @@ func (i *badgerDBIterator) Close() error {
 	return nil
 }
 
-func (i *badgerDBIterator) Domain() (start, end []byte) {
-	return i.start, i.end
-}
-
 func (i *badgerDBIterator) Error() error {
 	return i.lastErr
 }

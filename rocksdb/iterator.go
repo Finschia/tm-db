@@ -47,11 +47,6 @@ func newRocksDBIterator(source *gorocksdb.Iterator, start, end []byte, isReverse
 	}
 }
 
-// Domain implements Iterator.
-func (itr *rocksDBIterator) Domain() ([]byte, []byte) {
-	return itr.start, itr.end
-}
-
 // Valid implements Iterator.
 func (itr *rocksDBIterator) Valid() bool {
 

@@ -47,11 +47,6 @@ func newPrefixIterator(prefix, start, end []byte, source tmdb.Iterator) (*prefix
 	}, nil
 }
 
-// Domain implements Iterator.
-func (itr *prefixDBIterator) Domain() (start []byte, end []byte) {
-	return itr.start, itr.end
-}
-
 // Valid implements Iterator.
 func (itr *prefixDBIterator) Valid() bool {
 	if !itr.valid || itr.err != nil || !itr.source.Valid() {

@@ -25,7 +25,6 @@ remote database with a client setup such as:
 
 	for itr := client.Iterator(k1, k9); itr.Valid(); itr.Next() {
 	    ik, iv := itr.Key(), itr.Value()
-	    ds, de := itr.Domain()
 	}
 
 	stats := client.Stats()

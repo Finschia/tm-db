@@ -30,14 +30,6 @@ func (rItr *reverseIterator) Valid() bool {
 	return rItr.cur != nil && rItr.cur.Valid && rItr.err == nil
 }
 
-// Domain implements Iterator.
-func (rItr *reverseIterator) Domain() (start, end []byte) {
-	if rItr.cur == nil || rItr.cur.Domain == nil {
-		return nil, nil
-	}
-	return rItr.cur.Domain.Start, rItr.cur.Domain.End
-}
-
 // Next implements Iterator.
 func (rItr *reverseIterator) Next() {
 	var err error
@@ -90,14 +82,6 @@ var _ tmdb.Iterator = (*iterator)(nil)
 // Valid implements Iterator.
 func (itr *iterator) Valid() bool {
 	return itr.cur != nil && itr.cur.Valid && itr.err == nil
-}
-
-// Domain implements Iterator.
-func (itr *iterator) Domain() (start, end []byte) {
-	if itr.cur == nil || itr.cur.Domain == nil {
-		return nil, nil
-	}
-	return itr.cur.Domain.Start, itr.cur.Domain.End
 }
 
 // Next implements Iterator.
