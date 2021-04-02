@@ -66,6 +66,17 @@ func FileExists(filePath string) bool {
 	return !os.IsNotExist(err)
 }
 
+func PrefixRange(prefix []byte) (start, end []byte) {
+	if len(prefix) == 0 {
+		start = nil
+		end = nil
+	} else {
+		start = Cp(prefix)
+		end = CpIncr(prefix)
+	}
+	return start, end
+}
+
 // Path
 func MakePath(path string) error {
 	if len(path) == 0 {

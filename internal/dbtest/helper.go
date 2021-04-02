@@ -236,6 +236,89 @@ func verifyAndCloseIterator(t *testing.T, itr tmdb.Iterator, expected []int64, m
 	require.NoError(t, err)
 }
 
+// Empty iterator for empty db.
+func TestPrefixIteratorNoMatchNil(t *testing.T, db tmdb.DB) {
+	itr, err := db.PrefixIterator([]byte("2"))
+	require.NoError(t, err)
+	defer itr.Close()
+
+	Invalid(t, itr)
+}
+
+// Empty iterator for db populated after iterator created.
+func TestPrefixIteratorNoMatch1(t *testing.T, db tmdb.DB) {
+	itr, err := db.PrefixIterator([]byte("2"))
+	require.NoError(t, err)
+	defer itr.Close()
+
+	err = db.SetSync([]byte("1"), []byte("value_1"))
+	require.NoError(t, err)
+
+	Invalid(t, itr)
+}
+
+// Empty iterator for prefix starting after db entry.
+func TestPrefixIteratorNoMatch2(t *testing.T, db tmdb.DB) {
+	err := db.SetSync([]byte("3"), []byte("value_3"))
+	require.NoError(t, err)
+
+	itr, err := db.PrefixIterator([]byte("4"))
+	require.NoError(t, err)
+	defer itr.Close()
+
+	Invalid(t, itr)
+}
+
+// Iterator with single val for db with single val, starting from that val.
+func TestPrefixIteratorMatch1(t *testing.T, db tmdb.DB) {
+	err := db.SetSync([]byte("2"), []byte("value_2"))
+	require.NoError(t, err)
+
+	itr, err := db.PrefixIterator([]byte("2"))
+	require.NoError(t, err)
+	defer itr.Close()
+
+	Valid(t, itr, true)
+	Item(t, itr, []byte("2"), []byte("value_2"))
+	Next(t, itr, false)
+
+	// Once invalid...
+	Invalid(t, itr)
+}
+
+// Iterator with prefix iterates over everything with same prefix.
+func TestPrefixIteratorMatches1N(t *testing.T, db tmdb.DB) {
+	// prefixed
+	err := db.SetSync([]byte("a/1"), []byte("value_1"))
+	require.NoError(t, err)
+	err = db.SetSync([]byte("a/3"), []byte("value_3"))
+	require.NoError(t, err)
+
+	// not
+	err = db.SetSync([]byte("b/3"), []byte("value_3"))
+	require.NoError(t, err)
+	err = db.SetSync([]byte("a-3"), []byte("value_3"))
+	require.NoError(t, err)
+	err = db.SetSync([]byte("a.3"), []byte("value_3"))
+	require.NoError(t, err)
+	err = db.SetSync([]byte("abcdefg"), []byte("value_3"))
+	require.NoError(t, err)
+	itr, err := db.PrefixIterator([]byte("a/"))
+	require.NoError(t, err)
+	defer itr.Close()
+
+	Valid(t, itr, true)
+	Item(t, itr, []byte("a/1"), []byte("value_1"))
+	Next(t, itr, true)
+	Item(t, itr, []byte("a/3"), []byte("value_3"))
+
+	// Bad!
+	Next(t, itr, false)
+
+	// Once invalid...
+	Invalid(t, itr)
+}
+
 func TestDBBatch(t *testing.T, db tmdb.DB) {
 	// create a new batch, and some items - they should not be visible until we write
 	batch := db.NewBatch()

@@ -49,6 +49,8 @@ type DB interface {
 	// CONTRACT: start, end readonly []byte
 	Iterator(start, end []byte) (Iterator, error)
 
+	PrefixIterator(prefix []byte) (Iterator, error)
+
 	// ReverseIterator returns an iterator over a domain of keys, in descending order. The caller
 	// must call Close when done. End is exclusive, and start must be less than end. A nil end
 	// iterates from the last key (inclusive), and a nil start iterates to the first key (inclusive).
@@ -56,6 +58,8 @@ type DB interface {
 	// CONTRACT: No writes may happen within a domain while an iterator exists over it.
 	// CONTRACT: start, end readonly []byte
 	ReverseIterator(start, end []byte) (Iterator, error)
+
+	ReversePrefixIterator(prefix []byte) (Iterator, error)
 
 	// Close closes the database connection.
 	Close() error

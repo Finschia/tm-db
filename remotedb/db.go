@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"github.com/line/tm-db/v2/remotedb/grpcdb"
 	protodb "github.com/line/tm-db/v2/remotedb/proto"
 )
@@ -88,14 +89,6 @@ func (rd *RemoteDB) Has(key []byte) (bool, error) {
 	return res.Exists, nil
 }
 
-func (rd *RemoteDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
-	dic, err := rd.dc.ReverseIterator(rd.ctx, &protodb.Entity{Start: start, End: end})
-	if err != nil {
-		return nil, fmt.Errorf("RemoteDB.Iterator error: %w", err)
-	}
-	return makeReverseIterator(dic), nil
-}
-
 func (rd *RemoteDB) NewBatch() tmdb.Batch {
 	return newBatch(rd)
 }
@@ -120,4 +113,22 @@ func (rd *RemoteDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, fmt.Errorf("RemoteDB.Iterator error: %w", err)
 	}
 	return makeIterator(dic), nil
+}
+
+func (rd *RemoteDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return rd.Iterator(start, end)
+}
+
+func (rd *RemoteDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
+	dic, err := rd.dc.ReverseIterator(rd.ctx, &protodb.Entity{Start: start, End: end})
+	if err != nil {
+		return nil, fmt.Errorf("RemoteDB.Iterator error: %w", err)
+	}
+	return makeReverseIterator(dic), nil
+}
+
+func (rd *RemoteDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return rd.ReverseIterator(start, end)
 }
