@@ -111,6 +111,7 @@ func (pdb *PrefixDB) DeleteSync(key []byte) error {
 	return pdb.db.DeleteSync(pdb.prefixed(key))
 }
 
+// TODO refactor all iterators
 // Iterator implements DB.
 func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
@@ -134,6 +135,11 @@ func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	return newPrefixIterator(pdb.prefix, start, end, itr)
 }
 
+func (pdb *PrefixDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return pdb.Iterator(start, end)
+}
+
 // ReverseIterator implements DB.
 func (pdb *PrefixDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
@@ -155,6 +161,11 @@ func (pdb *PrefixDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	}
 
 	return newPrefixIterator(pdb.prefix, start, end, ritr)
+}
+
+func (pdb *PrefixDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return pdb.ReverseIterator(start, end)
 }
 
 // NewBatch implements DB.

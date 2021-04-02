@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/btree"
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 const (
@@ -177,6 +178,11 @@ func (db *MemDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	return newMemDBIterator(db, start, end, false), nil
 }
 
+func (db *MemDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return db.Iterator(start, end)
+}
+
 // ReverseIterator implements DB.
 // Takes out a read-lock on the database until the iterator is closed.
 func (db *MemDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
@@ -184,4 +190,9 @@ func (db *MemDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, tmdb.ErrKeyEmpty
 	}
 	return newMemDBIterator(db, start, end, true), nil
+}
+
+func (db *MemDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return db.ReverseIterator(start, end)
 }

@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	tmdb "github.com/line/tm-db/v2"
+	tmutil "github.com/line/tm-db/v2/internal/util"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/opt"
@@ -174,6 +175,11 @@ func (db *GoLevelDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	return newGoLevelDBIterator(itr, start, end, false), nil
 }
 
+func (db *GoLevelDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := tmutil.PrefixRange(prefix)
+	return db.Iterator(start, end)
+}
+
 // ReverseIterator implements DB.
 func (db *GoLevelDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
@@ -181,4 +187,9 @@ func (db *GoLevelDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	}
 	itr := db.db.NewIterator(&util.Range{Start: start, Limit: end}, nil)
 	return newGoLevelDBIterator(itr, start, end, true), nil
+}
+
+func (db *GoLevelDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := tmutil.PrefixRange(prefix)
+	return db.ReverseIterator(start, end)
 }

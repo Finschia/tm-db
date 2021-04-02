@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"go.etcd.io/bbolt"
 )
 
@@ -185,6 +186,11 @@ func (bdb *BoltDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	return newBoltDBIterator(tx, start, end, false), nil
 }
 
+func (bdb *BoltDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return bdb.Iterator(start, end)
+}
+
 // WARNING: Any concurrent writes or reads will block until the iterator is
 // closed.
 func (bdb *BoltDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
@@ -196,4 +202,9 @@ func (bdb *BoltDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, err
 	}
 	return newBoltDBIterator(tx, start, end, true), nil
+}
+
+func (bdb *BoltDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
+	start, end := util.PrefixRange(prefix)
+	return bdb.ReverseIterator(start, end)
 }
