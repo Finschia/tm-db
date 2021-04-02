@@ -44,6 +44,51 @@ func TestBadgerDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
+func TestBadgerDBPrefixIteratorNoMatchNil(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorNoMatchNil(t, db)
+}
+
+func TestBadgerDBPrefixIteratorNoMatch1(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorNoMatch1(t, db)
+}
+
+func TestBadgerDBPrefixIteratorNoMatch2(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorNoMatch2(t, db)
+}
+
+func TestBadgerDBPrefixIteratorMatch1(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorMatch1(t, db)
+}
+
+func TestBadgerDBPrefixIteratorMatches1N(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorMatches1N(t, db)
+}
+
 func TestBadgerDBBatch(t *testing.T) {
 	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)

@@ -44,6 +44,52 @@ func TestBoltDBEmptyIterator(t *testing.T) {
 	dbtest.TestDBEmptyIterator(t, db)
 }
 
+func TestBoltDBPrefixIteratorNoMatchNil(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorNoMatchNil(t, db)
+}
+
+// TODO bolt does not support concurrent writes while iterating
+// func TestBoltDBPrefixIteratorNoMatch1(t *testing.T) {
+// 	name, dir := dbtest.NewTestName("boltdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(t, err)
+//
+// 	dbtest.TestPrefixIteratorNoMatch1(t, db)
+// }
+
+func TestBoltDBPrefixIteratorNoMatch2(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorNoMatch2(t, db)
+}
+
+func TestBoltDBPrefixIteratorMatch1(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorMatch1(t, db)
+}
+
+func TestBoltDBPrefixIteratorMatches1N(t *testing.T) {
+	name, dir := dbtest.NewTestName("boltdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestPrefixIteratorMatches1N(t, db)
+}
+
 func TestBoltDBBatch(t *testing.T) {
 	name, dir := dbtest.NewTestName("boltdb")
 	db, err := NewDB(name, dir)
