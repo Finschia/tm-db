@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 
 	tmdb "github.com/line/tm-db/v2"
-	tmutil "github.com/line/tm-db/v2/internal/util"
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/opt"
@@ -172,12 +171,15 @@ func (db *GoLevelDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, tmdb.ErrKeyEmpty
 	}
 	itr := db.db.NewIterator(&util.Range{Start: start, Limit: end}, nil)
-	return newGoLevelDBIterator(itr, start, end, false), nil
+	return newGoLevelDBIterator(itr, false), nil
 }
 
 func (db *GoLevelDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := tmutil.PrefixRange(prefix)
-	return db.Iterator(start, end)
+	if prefix != nil && len(prefix) == 0 {
+		return nil, tmdb.ErrKeyEmpty
+	}
+	itr := db.db.NewIterator(util.BytesPrefix(prefix), nil)
+	return newGoLevelDBIterator(itr, false), nil
 }
 
 // ReverseIterator implements DB.
@@ -186,10 +188,13 @@ func (db *GoLevelDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, tmdb.ErrKeyEmpty
 	}
 	itr := db.db.NewIterator(&util.Range{Start: start, Limit: end}, nil)
-	return newGoLevelDBIterator(itr, start, end, true), nil
+	return newGoLevelDBIterator(itr, true), nil
 }
 
 func (db *GoLevelDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end := tmutil.PrefixRange(prefix)
-	return db.ReverseIterator(start, end)
+	if prefix != nil && len(prefix) == 0 {
+		return nil, tmdb.ErrKeyEmpty
+	}
+	itr := db.db.NewIterator(util.BytesPrefix(prefix), nil)
+	return newGoLevelDBIterator(itr, true), nil
 }
