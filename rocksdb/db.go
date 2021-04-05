@@ -205,12 +205,8 @@ func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 	}
 
 	ro := gorocksdb.NewDefaultReadOptions()
-	if start != nil {
-		ro.SetIterateLowerBound(start)
-	}
-	if end != nil {
-		ro.SetIterateUpperBound(end)
-	}
+	ro.SetIterateLowerBound(start)
+	ro.SetIterateUpperBound(end)
 	itr := db.db.NewIterator(ro)
 	ro.Destroy()
 
@@ -243,12 +239,8 @@ func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 	}
 
 	ro := gorocksdb.NewDefaultReadOptions()
-	if start != nil {
-		ro.SetIterateLowerBound(start)
-	}
-	if end != nil {
-		ro.SetIterateUpperBound(end)
-	}
+	ro.SetIterateLowerBound(start)
+	ro.SetIterateUpperBound(end)
 	itr := db.db.NewIterator(ro)
 	ro.Destroy()
 

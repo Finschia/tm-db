@@ -72,14 +72,8 @@ func PrefixRange(prefix []byte) (start, end []byte, err error) {
 	if len(prefix) == 0 {
 		return nil, nil, tmdb.ErrKeyEmpty
 	}
-
-	if len(prefix) == 0 {
-		start = nil
-		end = nil
-	} else {
-		start = Cp(prefix)
-		end = CpIncr(prefix)
-	}
+	start = Cp(prefix)
+	end = CpIncr(prefix)
 	return start, end, nil
 }
 
