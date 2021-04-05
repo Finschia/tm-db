@@ -184,8 +184,18 @@ func (db *RocksDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
 		return nil, tmdb.ErrKeyEmpty
 	}
-	itr := db.db.NewIterator(db.ro)
-	return newRocksDBIterator(itr, start, end, false), nil
+
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
+	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	itr := db.db.NewIterator(ro)
+	ro.Destroy()
+
+	return newRocksDBIterator(itr, false), nil
 }
 
 func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
@@ -193,8 +203,18 @@ func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 	if err != nil {
 		return nil, err
 	}
-	itr := db.db.NewIterator(db.ro)
-	return newRocksDBIterator(itr, start, end, false), nil
+
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
+	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	itr := db.db.NewIterator(ro)
+	ro.Destroy()
+
+	return newRocksDBIterator(itr, false), nil
 }
 
 // ReverseIterator implements DB.
@@ -202,8 +222,18 @@ func (db *RocksDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
 		return nil, tmdb.ErrKeyEmpty
 	}
-	itr := db.db.NewIterator(db.ro)
-	return newRocksDBIterator(itr, start, end, true), nil
+
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
+	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	itr := db.db.NewIterator(ro)
+	ro.Destroy()
+
+	return newRocksDBIterator(itr, true), nil
 }
 
 func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
@@ -211,6 +241,16 @@ func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 	if err != nil {
 		return nil, err
 	}
-	itr := db.db.NewIterator(db.ro)
-	return newRocksDBIterator(itr, start, end, true), nil
+
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
+	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	itr := db.db.NewIterator(ro)
+	ro.Destroy()
+
+	return newRocksDBIterator(itr, true), nil
 }

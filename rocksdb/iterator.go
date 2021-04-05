@@ -1,49 +1,30 @@
 package rocksdb
 
 import (
-	"bytes"
-
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 	"github.com/tecbot/gorocksdb"
 )
 
 type rocksDBIterator struct {
-	source     *gorocksdb.Iterator
-	start, end []byte
-	isReverse  bool
-	isInvalid  bool
-	key        []byte
-	value      []byte
+	source    *gorocksdb.Iterator
+	isReverse bool
+	isInvalid bool
+	key       []byte
+	value     []byte
 }
 
 var _ tmdb.Iterator = (*rocksDBIterator)(nil)
 
-func newRocksDBIterator(source *gorocksdb.Iterator, start, end []byte, isReverse bool) *rocksDBIterator {
+func newRocksDBIterator(source *gorocksdb.Iterator, isReverse bool) *rocksDBIterator {
 	if !isReverse {
-		if len(start) == 0 {
-			source.SeekToFirst()
-		} else {
-			source.Seek(start)
-		}
+		source.SeekToFirst()
 	} else {
-		if len(end) == 0 {
-			source.SeekToLast()
-		} else {
-			source.Seek(end)
-			if source.Valid() {
-				eoakey := moveSliceToBytes(source.Key()) // end or after key
-				if bytes.Compare(end, eoakey) <= 0 {
-					source.Prev()
-				}
-			} else {
-				source.SeekToLast()
-			}
-		}
+		source.SeekToLast()
 	}
+
 	return &rocksDBIterator{
 		source:    source,
-		start:     start,
-		end:       end,
 		isReverse: isReverse,
 		isInvalid: false,
 	}
@@ -60,22 +41,6 @@ func (itr *rocksDBIterator) Valid() bool {
 	if !itr.source.Valid() {
 		itr.invalidate()
 		return false
-	}
-
-	// If key is end or past it, invalid.
-	var start = itr.start
-	var end = itr.end
-	var key = itr.Key()
-	if !itr.isReverse {
-		if end != nil && bytes.Compare(end, key) <= 0 {
-			itr.invalidate()
-			return false
-		}
-	} else {
-		if start != nil && bytes.Compare(key, start) < 0 {
-			itr.invalidate()
-			return false
-		}
 	}
 
 	// It's valid.
@@ -141,11 +106,10 @@ func (itr *rocksDBIterator) assertIsValid() {
 // This function can be applied on *Slice returned from Key() and Value()
 // of an Iterator, because they are marked as freed.
 func moveSliceToBytes(s *gorocksdb.Slice) []byte {
-	defer s.Free()
-	if !s.Exists() {
-		return nil
+	var bz []byte
+	if s.Exists() {
+		bz = util.Cp(s.Data())
 	}
-	v := make([]byte, len(s.Data()))
-	copy(v, s.Data())
-	return v
+	s.Free()
+	return bz
 }
