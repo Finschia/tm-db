@@ -175,7 +175,7 @@ func (db *GoLevelDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *GoLevelDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	if prefix != nil && len(prefix) == 0 {
+	if len(prefix) == 0 {
 		return nil, tmdb.ErrKeyEmpty
 	}
 	itr := db.db.NewIterator(util.BytesPrefix(prefix), nil)
@@ -192,7 +192,7 @@ func (db *GoLevelDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *GoLevelDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	if prefix != nil && len(prefix) == 0 {
+	if len(prefix) == 0 {
 		return nil, tmdb.ErrKeyEmpty
 	}
 	itr := db.db.NewIterator(util.BytesPrefix(prefix), nil)

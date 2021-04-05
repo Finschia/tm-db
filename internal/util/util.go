@@ -69,7 +69,7 @@ func FileExists(filePath string) bool {
 }
 
 func PrefixRange(prefix []byte) (start, end []byte, err error) {
-	if prefix != nil && len(prefix) == 0 {
+	if len(prefix) == 0 {
 		return nil, nil, tmdb.ErrKeyEmpty
 	}
 

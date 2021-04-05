@@ -226,20 +226,16 @@ func TestDBPrefixIterator(t *testing.T, db tmdb.DB) {
 	}
 
 	// Blank iterator keys should error
-	_, err := db.PrefixIterator([]byte{})
+	_, err := db.PrefixIterator(nil)
+	require.Equal(t, tmdb.ErrKeyEmpty, err)
+	_, err = db.PrefixIterator([]byte{})
+	require.Equal(t, tmdb.ErrKeyEmpty, err)
+	_, err = db.ReversePrefixIterator(nil)
 	require.Equal(t, tmdb.ErrKeyEmpty, err)
 	_, err = db.ReversePrefixIterator([]byte{})
 	require.Equal(t, tmdb.ErrKeyEmpty, err)
 
-	itr, err := db.PrefixIterator(nil)
-	require.NoError(t, err)
-	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")
-
-	ritr, err := db.ReversePrefixIterator(nil)
-	require.NoError(t, err)
-	verifyAndCloseIterator(t, ritr, []int64{9, 8, 7, 5, 4, 3, 2, 1, 0}, "reverse iterator")
-
-	itr, err = db.PrefixIterator(Int642Bytes(0))
+	itr, err := db.PrefixIterator(Int642Bytes(0))
 	require.NoError(t, err)
 	verifyAndCloseIterator(t, itr, []int64{0}, "forward iterator with 0 prefix")
 
