@@ -1,8 +1,8 @@
 package rocksdb
 
 import (
+	"github.com/line/gorocksdb"
 	tmdb "github.com/line/tm-db/v2"
-	"github.com/tecbot/gorocksdb"
 )
 
 type rocksDBBatch struct {

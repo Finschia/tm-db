@@ -483,7 +483,6 @@ func BenchmarkRangeScans(b *testing.B, db tmdb.DB, dbSize int64) {
 	b.StartTimer()
 
 	for i := 0; i < b.N; i++ {
-
 		start := rand.Int63n(dbSize - rangeSize) // nolint: gosec
 		end := start + rangeSize
 		iter, err := db.Iterator(Int642Bytes(start), Int642Bytes(end))
