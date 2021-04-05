@@ -185,17 +185,10 @@ func (db *RocksDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, tmdb.ErrKeyEmpty
 	}
 
-	ro := gorocksdb.NewDefaultReadOptions()
-	if start != nil {
-		ro.SetIterateLowerBound(start)
-	}
-	if end != nil {
-		ro.SetIterateUpperBound(end)
-	}
+	ro := newRockDBRangeOptions(start, end)
 	itr := db.db.NewIterator(ro)
-	ro.Destroy()
 
-	return newRocksDBIterator(itr, false), nil
+	return newRocksDBIterator(itr, ro, false), nil
 }
 
 func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
@@ -204,13 +197,10 @@ func (db *RocksDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 		return nil, err
 	}
 
-	ro := gorocksdb.NewDefaultReadOptions()
-	ro.SetIterateLowerBound(start)
-	ro.SetIterateUpperBound(end)
+	ro := newRockDBRangeOptions(start, end)
 	itr := db.db.NewIterator(ro)
-	ro.Destroy()
 
-	return newRocksDBIterator(itr, false), nil
+	return newRocksDBIterator(itr, ro, false), nil
 }
 
 // ReverseIterator implements DB.
@@ -219,17 +209,10 @@ func (db *RocksDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 		return nil, tmdb.ErrKeyEmpty
 	}
 
-	ro := gorocksdb.NewDefaultReadOptions()
-	if start != nil {
-		ro.SetIterateLowerBound(start)
-	}
-	if end != nil {
-		ro.SetIterateUpperBound(end)
-	}
+	ro := newRockDBRangeOptions(start, end)
 	itr := db.db.NewIterator(ro)
-	ro.Destroy()
 
-	return newRocksDBIterator(itr, true), nil
+	return newRocksDBIterator(itr, ro, true), nil
 }
 
 func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
@@ -238,11 +221,8 @@ func (db *RocksDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
 		return nil, err
 	}
 
-	ro := gorocksdb.NewDefaultReadOptions()
-	ro.SetIterateLowerBound(start)
-	ro.SetIterateUpperBound(end)
+	ro := newRockDBRangeOptions(start, end)
 	itr := db.db.NewIterator(ro)
-	ro.Destroy()
 
-	return newRocksDBIterator(itr, true), nil
+	return newRocksDBIterator(itr, ro, true), nil
 }

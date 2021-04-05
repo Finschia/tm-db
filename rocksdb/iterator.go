@@ -8,6 +8,7 @@ import (
 
 type rocksDBIterator struct {
 	source    *gorocksdb.Iterator
+	opts      *gorocksdb.ReadOptions
 	isReverse bool
 	isInvalid bool
 	key       []byte
@@ -16,7 +17,18 @@ type rocksDBIterator struct {
 
 var _ tmdb.Iterator = (*rocksDBIterator)(nil)
 
-func newRocksDBIterator(source *gorocksdb.Iterator, isReverse bool) *rocksDBIterator {
+func newRockDBRangeOptions(start, end []byte) *gorocksdb.ReadOptions {
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
+	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	return ro
+}
+
+func newRocksDBIterator(source *gorocksdb.Iterator, opts *gorocksdb.ReadOptions, isReverse bool) *rocksDBIterator {
 	if !isReverse {
 		source.SeekToFirst()
 	} else {
@@ -25,6 +37,7 @@ func newRocksDBIterator(source *gorocksdb.Iterator, isReverse bool) *rocksDBIter
 
 	return &rocksDBIterator{
 		source:    source,
+		opts:      opts,
 		isReverse: isReverse,
 		isInvalid: false,
 	}
@@ -92,7 +105,14 @@ func (itr *rocksDBIterator) Error() error {
 
 // Close implements Iterator.
 func (itr *rocksDBIterator) Close() error {
-	itr.source.Close()
+	if itr.source != nil {
+		itr.source.Close()
+		itr.source = nil
+	}
+	if itr.opts != nil {
+		itr.opts.Destroy()
+		itr.opts = nil
+	}
 	return nil
 }
 
