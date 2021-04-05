@@ -73,3 +73,11 @@ func NewDB(name string, backend BackendType, dir string) (tmdb.DB, error) {
 	}
 	return db, nil
 }
+
+func AvailableDBBackends() []BackendType {
+	registeredBackends := make([]BackendType, 0, len(backends))
+	for key := range backends {
+		registeredBackends = append(registeredBackends, key)
+	}
+	return registeredBackends
+}

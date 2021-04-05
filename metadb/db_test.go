@@ -147,6 +147,14 @@ func TestDBIteratorNonemptyBeginAfter(t *testing.T) {
 	}
 }
 
+func TestAvailableDBBackends(t *testing.T) {
+	backendList := AvailableDBBackends()
+	assert.True(t, len(backends) == len(backendList))
+	for _, b := range backendList {
+		assert.NotNil(t, backends[b])
+	}
+}
+
 func newTempDB(t *testing.T, backend BackendType) (db tmdb.DB, name, dir string) {
 	name, dir = dbtest.NewTestName(fmt.Sprintf("%s", backend))
 	db, err := NewDB(name, backend, dir)
