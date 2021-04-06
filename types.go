@@ -49,6 +49,7 @@ type DB interface {
 	// CONTRACT: start, end readonly []byte
 	Iterator(start, end []byte) (Iterator, error)
 
+	// CONTRACT: `prefix` should neither be `nil` nor `len(prefix) == 0`
 	PrefixIterator(prefix []byte) (Iterator, error)
 
 	// ReverseIterator returns an iterator over a domain of keys, in descending order. The caller
@@ -59,6 +60,7 @@ type DB interface {
 	// CONTRACT: start, end readonly []byte
 	ReverseIterator(start, end []byte) (Iterator, error)
 
+	// CONTRACT: `prefix` should neither be `nil` nor `len(prefix) == 0`
 	ReversePrefixIterator(prefix []byte) (Iterator, error)
 
 	// Close closes the database connection.
@@ -79,6 +81,7 @@ type DB interface {
 //
 // As with DB, given keys and values should be considered read-only, and must not be modified after
 // passing them to the batch.
+// CONTRACT: `Batch` is `NOT` concurrency-safe. You should protect it by yourself from concurrency.
 type Batch interface {
 	// Set sets a key/value pair.
 	// CONTRACT: key, value readonly []byte
@@ -122,6 +125,7 @@ type Batch interface {
 // if err := itr.Error(); err != nil {
 //   ...
 // }
+// CONTRACT: `Iterator` is `NOT` concurrency-safe. You should protect it by yourself from concurrency.
 type Iterator interface {
 	// Valid returns whether the current iterator is valid. Once invalid, the Iterator remains
 	// invalid forever.

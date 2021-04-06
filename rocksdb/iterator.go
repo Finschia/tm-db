@@ -1,47 +1,43 @@
 package rocksdb
 
 import (
-	"bytes"
-
+	"github.com/line/gorocksdb"
 	tmdb "github.com/line/tm-db/v2"
-	"github.com/tecbot/gorocksdb"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 type rocksDBIterator struct {
-	source     *gorocksdb.Iterator
-	start, end []byte
-	isReverse  bool
-	isInvalid  bool
+	source    *gorocksdb.Iterator
+	opts      *gorocksdb.ReadOptions
+	isReverse bool
+	isInvalid bool
+	key       []byte
+	value     []byte
 }
 
 var _ tmdb.Iterator = (*rocksDBIterator)(nil)
 
-func newRocksDBIterator(source *gorocksdb.Iterator, start, end []byte, isReverse bool) *rocksDBIterator {
-	if isReverse {
-		if end == nil {
-			source.SeekToLast()
-		} else {
-			source.Seek(end)
-			if source.Valid() {
-				eoakey := moveSliceToBytes(source.Key()) // end or after key
-				if bytes.Compare(end, eoakey) <= 0 {
-					source.Prev()
-				}
-			} else {
-				source.SeekToLast()
-			}
-		}
-	} else {
-		if start == nil {
-			source.SeekToFirst()
-		} else {
-			source.Seek(start)
-		}
+func newRockDBRangeOptions(start, end []byte) *gorocksdb.ReadOptions {
+	ro := gorocksdb.NewDefaultReadOptions()
+	if start != nil {
+		ro.SetIterateLowerBound(start)
 	}
+	if end != nil {
+		ro.SetIterateUpperBound(end)
+	}
+	return ro
+}
+
+func newRocksDBIterator(source *gorocksdb.Iterator, opts *gorocksdb.ReadOptions, isReverse bool) *rocksDBIterator {
+	if !isReverse {
+		source.SeekToFirst()
+	} else {
+		source.SeekToLast()
+	}
+
 	return &rocksDBIterator{
 		source:    source,
-		start:     start,
-		end:       end,
+		opts:      opts,
 		isReverse: isReverse,
 		isInvalid: false,
 	}
@@ -49,63 +45,56 @@ func newRocksDBIterator(source *gorocksdb.Iterator, start, end []byte, isReverse
 
 // Valid implements Iterator.
 func (itr *rocksDBIterator) Valid() bool {
-
 	// Once invalid, forever invalid.
 	if itr.isInvalid {
 		return false
 	}
 
-	// If source has error, invalid.
-	if err := itr.source.Err(); err != nil {
-		itr.isInvalid = true
-		return false
-	}
-
 	// If source is invalid, invalid.
 	if !itr.source.Valid() {
-		itr.isInvalid = true
+		itr.invalidate()
 		return false
-	}
-
-	// If key is end or past it, invalid.
-	var start = itr.start
-	var end = itr.end
-	var key = moveSliceToBytes(itr.source.Key())
-	if itr.isReverse {
-		if start != nil && bytes.Compare(key, start) < 0 {
-			itr.isInvalid = true
-			return false
-		}
-	} else {
-		if end != nil && bytes.Compare(end, key) <= 0 {
-			itr.isInvalid = true
-			return false
-		}
 	}
 
 	// It's valid.
 	return true
 }
 
+func (itr *rocksDBIterator) invalidate() {
+	itr.isInvalid = true
+	itr.key = nil
+	itr.value = nil
+}
+
 // Key implements Iterator.
 func (itr *rocksDBIterator) Key() []byte {
 	itr.assertIsValid()
-	return moveSliceToBytes(itr.source.Key())
+	if itr.key == nil {
+		itr.key = moveSliceToBytes(itr.source.Key())
+	}
+	return itr.key
 }
 
 // Value implements Iterator.
 func (itr *rocksDBIterator) Value() []byte {
 	itr.assertIsValid()
-	return moveSliceToBytes(itr.source.Value())
+	if itr.value == nil {
+		itr.value = moveSliceToBytes(itr.source.Value())
+	}
+	return itr.value
 }
 
 // Next implements Iterator.
-func (itr rocksDBIterator) Next() {
+func (itr *rocksDBIterator) Next() {
 	itr.assertIsValid()
-	if itr.isReverse {
-		itr.source.Prev()
-	} else {
+
+	itr.key = nil
+	itr.value = nil
+
+	if !itr.isReverse {
 		itr.source.Next()
+	} else {
+		itr.source.Prev()
 	}
 }
 
@@ -116,12 +105,19 @@ func (itr *rocksDBIterator) Error() error {
 
 // Close implements Iterator.
 func (itr *rocksDBIterator) Close() error {
-	itr.source.Close()
+	if itr.source != nil {
+		itr.source.Close()
+		itr.source = nil
+	}
+	if itr.opts != nil {
+		itr.opts.Destroy()
+		itr.opts = nil
+	}
 	return nil
 }
 
 func (itr *rocksDBIterator) assertIsValid() {
-	if !itr.Valid() {
+	if itr.isInvalid {
 		panic("iterator is invalid")
 	}
 }
@@ -130,11 +126,10 @@ func (itr *rocksDBIterator) assertIsValid() {
 // This function can be applied on *Slice returned from Key() and Value()
 // of an Iterator, because they are marked as freed.
 func moveSliceToBytes(s *gorocksdb.Slice) []byte {
-	defer s.Free()
-	if !s.Exists() {
-		return nil
+	var bz []byte
+	if s.Exists() {
+		bz = util.Cp(s.Data())
 	}
-	v := make([]byte, len(s.Data()))
-	copy(v, s.Data())
-	return v
+	s.Free()
+	return bz
 }
