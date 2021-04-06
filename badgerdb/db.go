@@ -136,7 +136,7 @@ func (b *BadgerDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (b *BadgerDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (b *BadgerDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (b *BadgerDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}

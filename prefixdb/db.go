@@ -19,6 +19,11 @@ var _ tmdb.DB = (*PrefixDB)(nil)
 
 // NewPrefixDB lets you namespace multiple DBs within a single DB.
 func NewDB(db tmdb.DB, prefix []byte) *PrefixDB {
+	// TODO return error
+	if len(prefix) == 0 {
+		panic("prefix should not be empty")
+	}
+
 	return &PrefixDB{
 		prefix: prefix,
 		db:     db,
@@ -111,7 +116,6 @@ func (pdb *PrefixDB) DeleteSync(key []byte) error {
 	return pdb.db.DeleteSync(pdb.prefixed(key))
 }
 
-// TODO refactor all iterators
 // Iterator implements DB.
 func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	if (start != nil && len(start) == 0) || (end != nil && len(end) == 0) {
@@ -120,27 +124,35 @@ func (pdb *PrefixDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 	pdb.mtx.Lock()
 	defer pdb.mtx.Unlock()
 
-	var pstart, pend []byte
-	pstart = util.Concat(pdb.prefix, start)
-	if end == nil {
-		pend = util.CpIncr(pdb.prefix)
+	var itr tmdb.Iterator
+	var err error
+	if start == nil && end == nil {
+		// NOTE `PrefixIterator` has more chance to optimize performance
+		itr, err = pdb.db.PrefixIterator(pdb.prefix)
 	} else {
-		pend = util.Concat(pdb.prefix, end)
+		pstart, pend := pdb.prefixedRange(start, end)
+		itr, err = pdb.db.Iterator(pstart, pend)
 	}
-	itr, err := pdb.db.Iterator(pstart, pend)
 	if err != nil {
 		return nil, err
 	}
 
-	return newPrefixIterator(pdb.prefix, start, end, itr)
+	return newPrefixIterator(pdb.prefix, itr)
 }
 
 func (pdb *PrefixDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	if len(prefix) == 0 {
+		return nil, tmdb.ErrKeyEmpty
+	}
+	pdb.mtx.Lock()
+	defer pdb.mtx.Unlock()
+
+	itr, err := pdb.db.PrefixIterator(pdb.prefixed(prefix))
 	if err != nil {
 		return nil, err
 	}
-	return pdb.Iterator(start, end)
+
+	return newPrefixIterator(pdb.prefix, itr)
 }
 
 // ReverseIterator implements DB.
@@ -151,27 +163,35 @@ func (pdb *PrefixDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 	pdb.mtx.Lock()
 	defer pdb.mtx.Unlock()
 
-	var pstart, pend []byte
-	pstart = util.Concat(pdb.prefix, start)
-	if end == nil {
-		pend = util.CpIncr(pdb.prefix)
+	var ritr tmdb.Iterator
+	var err error
+	if start == nil && end == nil {
+		// NOTE `ReversePrefixIterator` has more chance to optimize performance
+		ritr, err = pdb.db.ReversePrefixIterator(pdb.prefix)
 	} else {
-		pend = util.Concat(pdb.prefix, end)
+		pstart, pend := pdb.prefixedRange(start, end)
+		ritr, err = pdb.db.ReverseIterator(pstart, pend)
 	}
-	ritr, err := pdb.db.ReverseIterator(pstart, pend)
 	if err != nil {
 		return nil, err
 	}
 
-	return newPrefixIterator(pdb.prefix, start, end, ritr)
+	return newPrefixIterator(pdb.prefix, ritr)
 }
 
 func (pdb *PrefixDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	if len(prefix) == 0 {
+		return nil, tmdb.ErrKeyEmpty
+	}
+	pdb.mtx.Lock()
+	defer pdb.mtx.Unlock()
+
+	itr, err := pdb.db.ReversePrefixIterator(pdb.prefixed(prefix))
 	if err != nil {
 		return nil, err
 	}
-	return pdb.ReverseIterator(start, end)
+
+	return newPrefixIterator(pdb.prefix, itr)
 }
 
 // NewBatch implements DB.
@@ -221,4 +241,14 @@ func (pdb *PrefixDB) Stats() map[string]string {
 
 func (pdb *PrefixDB) prefixed(key []byte) []byte {
 	return util.Concat(pdb.prefix, key)
+}
+
+func (pdb *PrefixDB) prefixedRange(start, end []byte) (pstart, pend []byte) {
+	pstart = util.Concat(pdb.prefix, start)
+	if end == nil {
+		pend = util.CpIncr(pdb.prefix)
+	} else {
+		pend = util.Concat(pdb.prefix, end)
+	}
+	return pstart, pend
 }

@@ -10,8 +10,6 @@ import (
 // Strips prefix while iterating from Iterator.
 type prefixDBIterator struct {
 	prefix []byte
-	start  []byte
-	end    []byte
 	source tmdb.Iterator
 	valid  bool
 	err    error
@@ -19,11 +17,9 @@ type prefixDBIterator struct {
 
 var _ tmdb.Iterator = (*prefixDBIterator)(nil)
 
-func newPrefixIterator(prefix, start, end []byte, source tmdb.Iterator) (*prefixDBIterator, error) {
+func newPrefixIterator(prefix []byte, source tmdb.Iterator) (*prefixDBIterator, error) {
 	pitrInvalid := &prefixDBIterator{
 		prefix: prefix,
-		start:  start,
-		end:    end,
 		source: source,
 		valid:  false,
 	}
@@ -40,8 +36,6 @@ func newPrefixIterator(prefix, start, end []byte, source tmdb.Iterator) (*prefix
 
 	return &prefixDBIterator{
 		prefix: prefix,
-		start:  start,
-		end:    end,
 		source: source,
 		valid:  true,
 	}, nil
