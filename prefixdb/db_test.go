@@ -1,3 +1,5 @@
+// +build prefixdb
+
 package prefixdb_test
 
 import (
@@ -7,6 +9,7 @@ import (
 	"github.com/line/tm-db/v2/internal/dbtest"
 	"github.com/line/tm-db/v2/memdb"
 	"github.com/line/tm-db/v2/prefixdb"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -113,4 +116,175 @@ func TestPrefixDBReverseIterator7(t *testing.T) {
 	dbtest.Next(t, itr, false)
 	dbtest.Invalid(t, itr)
 	itr.Close()
+}
+
+func TestPrefixDBNewDB(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	require.Panics(t, func() {
+		prefixdb.NewDB(db, []byte{})
+	})
+
+	require.Panics(t, func() {
+		prefixdb.NewDB(db, nil)
+	})
+}
+
+func TestPrefixDBStats(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	assert.NotEmpty(t, pdb.Stats())
+}
+
+func TestPrefixDBIterator(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestDBIterator(t, pdb)
+}
+
+func TestPrefixDBIteratorNoWrites(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestDBIteratorNoWrites(t, pdb)
+}
+
+func TestPrefixDBEmptyIterator(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestDBEmptyIterator(t, pdb)
+}
+
+func TestPrefixDBPrefixIterator(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestDBPrefixIterator(t, pdb)
+}
+
+func TestPrefixDBPrefixIteratorNoMatchNil(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestPrefixIteratorNoMatchNil(t, pdb)
+}
+
+func TestPrefixDBPrefixIteratorNoMatch1(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestPrefixIteratorNoMatch1(t, pdb)
+}
+
+func TestPrefixDBPrefixIteratorNoMatch2(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestPrefixIteratorNoMatch2(t, pdb)
+}
+
+func TestPrefixDBPrefixIteratorMatch1(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestPrefixIteratorMatch1(t, pdb)
+}
+
+func TestPrefixDBPrefixIteratorMatches1N(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestPrefixIteratorMatches1N(t, pdb)
+}
+
+func TestPrefixDBBatch(t *testing.T) {
+	db := memdb.NewDB()
+	require.NotNil(t, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(t, pdb)
+	defer pdb.Close()
+
+	dbtest.TestDBBatch(t, pdb)
+}
+
+func BenchmarkPrefixDBRangeScans1M(b *testing.B) {
+	db := memdb.NewDB()
+	require.NotNil(b, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(b, pdb)
+	defer pdb.Close()
+
+	dbtest.BenchmarkRangeScans(b, pdb, int64(1e6))
+}
+
+func BenchmarkPrefixDBRangeScans10M(b *testing.B) {
+	db := memdb.NewDB()
+	require.NotNil(b, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(b, pdb)
+	defer pdb.Close()
+
+	dbtest.BenchmarkRangeScans(b, pdb, int64(10e6))
+}
+
+func BenchmarkPrefixDBRandomReadsWrites(b *testing.B) {
+	db := memdb.NewDB()
+	require.NotNil(b, db)
+	defer db.Close()
+	pdb := prefixdb.NewDB(db, []byte("key"))
+	require.NotNil(b, pdb)
+	defer pdb.Close()
+
+	dbtest.BenchmarkRandomReadsWrites(b, pdb)
 }

@@ -2,81 +2,70 @@ package prefixdb
 
 import (
 	"bytes"
-	"fmt"
-
 	tmdb "github.com/line/tm-db/v2"
 )
 
 // Strips prefix while iterating from Iterator.
 type prefixDBIterator struct {
-	prefix []byte
-	source tmdb.Iterator
-	valid  bool
-	err    error
+	prefix    []byte
+	source    tmdb.Iterator
+	isInvalid bool
 }
 
 var _ tmdb.Iterator = (*prefixDBIterator)(nil)
 
 func newPrefixIterator(prefix []byte, source tmdb.Iterator) (*prefixDBIterator, error) {
-	pitrInvalid := &prefixDBIterator{
-		prefix: prefix,
-		source: source,
-		valid:  false,
-	}
-
 	// Empty keys are not allowed, so if a key exists in the database that exactly matches the
 	// prefix we need to skip it.
 	if source.Valid() && bytes.Equal(source.Key(), prefix) {
 		source.Next()
 	}
 
-	if !source.Valid() || !bytes.HasPrefix(source.Key(), prefix) {
-		return pitrInvalid, nil
-	}
-
 	return &prefixDBIterator{
-		prefix: prefix,
-		source: source,
-		valid:  true,
+		prefix:    prefix,
+		source:    source,
+		isInvalid: !source.Valid(),
 	}, nil
 }
 
 // Valid implements Iterator.
 func (itr *prefixDBIterator) Valid() bool {
-	if !itr.valid || itr.err != nil || !itr.source.Valid() {
+	// Once invalid, forever invalid.
+	if itr.isInvalid {
 		return false
 	}
 
-	key := itr.source.Key()
-	if len(key) < len(itr.prefix) || !bytes.Equal(key[:len(itr.prefix)], itr.prefix) {
-		itr.err = fmt.Errorf("received invalid key from backend: %x (expected prefix %x)",
-			key, itr.prefix)
+	// If source is invalid, invalid.
+	if !itr.source.Valid() {
+		itr.invalidate()
+		return false
+	}
+
+	// Empty keys are not allowed, so if a key exists in the database that exactly matches the
+	// prefix we need to skip it.
+	if bytes.Equal(itr.source.Key(), itr.prefix) {
+		itr.invalidate()
 		return false
 	}
 
 	return true
 }
 
+func (itr *prefixDBIterator) invalidate() {
+	itr.isInvalid = true
+}
+
 // Next implements Iterator.
 func (itr *prefixDBIterator) Next() {
 	itr.assertIsValid()
 	itr.source.Next()
-
-	if !itr.source.Valid() || !bytes.HasPrefix(itr.source.Key(), itr.prefix) {
-		itr.valid = false
-
-	} else if bytes.Equal(itr.source.Key(), itr.prefix) {
-		// Empty keys are not allowed, so if a key exists in the database that exactly matches the
-		// prefix we need to skip it.
-		itr.Next()
-	}
 }
 
 // Next implements Iterator.
 func (itr *prefixDBIterator) Key() []byte {
 	itr.assertIsValid()
 	key := itr.source.Key()
-	return key[len(itr.prefix):] // we have checked the key in Valid()
+	return key[len(itr.prefix):]
 }
 
 // Value implements Iterator.
@@ -87,10 +76,7 @@ func (itr *prefixDBIterator) Value() []byte {
 
 // Error implements Iterator.
 func (itr *prefixDBIterator) Error() error {
-	if err := itr.source.Error(); err != nil {
-		return err
-	}
-	return itr.err
+	return itr.source.Error()
 }
 
 // Close implements Iterator.
@@ -99,7 +85,7 @@ func (itr *prefixDBIterator) Close() error {
 }
 
 func (itr *prefixDBIterator) assertIsValid() {
-	if !itr.Valid() {
+	if itr.isInvalid {
 		panic("iterator is invalid")
 	}
 }
