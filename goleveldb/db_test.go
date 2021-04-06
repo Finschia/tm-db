@@ -55,6 +55,15 @@ func TestGoLevelDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
+func TestGoLevelDBIteratorNoWrites(t *testing.T) {
+	name, dir := dbtest.NewTestName("goleveldb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBIteratorNoWrites(t, db)
+}
+
 func TestGoLevelDBEmptyIterator(t *testing.T) {
 	name, dir := dbtest.NewTestName("goleveldb")
 	db, err := NewDB(name, dir)

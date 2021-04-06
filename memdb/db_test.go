@@ -30,6 +30,13 @@ func TestMemDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
+func TestMemDBIteratorNoWrites(t *testing.T) {
+	db := NewDB()
+	defer db.Close()
+
+	dbtest.TestDBIteratorNoWrites(t, db)
+}
+
 func TestMemDBEmptyIterator(t *testing.T) {
 	db := NewDB()
 	defer db.Close()

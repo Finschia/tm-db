@@ -35,6 +35,15 @@ func TestBadgerDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
+func TestBadgerDBIteratorNoWrites(t *testing.T) {
+	name, dir := dbtest.NewTestName("badgerdb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBIteratorNoWrites(t, db)
+}
+
 func TestBadgerDBEmptyIterator(t *testing.T) {
 	name, dir := dbtest.NewTestName("badgerdb")
 	db, err := NewDB(name, dir)
