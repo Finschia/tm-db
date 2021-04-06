@@ -35,6 +35,16 @@ func TestBoltDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
+// TODO bolt does not support concurrent writes while iterating
+// func TestBoltDBIteratorNoWrites(t *testing.T) {
+// 	name, dir := dbtest.NewTestName("boltdb")
+// 	db, err := NewDB(name, dir)
+// 	defer dbtest.CleanupDB(db, name, dir)
+// 	require.NoError(t, err)
+//
+// 	dbtest.TestDBIteratorNoWrites(t, db)
+// }
+
 func TestBoltDBEmptyIterator(t *testing.T) {
 	name, dir := dbtest.NewTestName("boltdb")
 	db, err := NewDB(name, dir)

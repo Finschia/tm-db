@@ -35,6 +35,15 @@ func TestCLevelDBIterator(t *testing.T) {
 	dbtest.TestDBIterator(t, db)
 }
 
+func TestCLevelDBIteratorNoWrites(t *testing.T) {
+	name, dir := dbtest.NewTestName("cleveldb")
+	db, err := NewDB(name, dir)
+	defer dbtest.CleanupDB(db, name, dir)
+	require.NoError(t, err)
+
+	dbtest.TestDBIteratorNoWrites(t, db)
+}
+
 func TestCLevelDBEmptyIterator(t *testing.T) {
 	name, dir := dbtest.NewTestName("cleveldb")
 	db, err := NewDB(name, dir)

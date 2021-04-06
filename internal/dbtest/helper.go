@@ -207,6 +207,27 @@ func TestDBIterator(t *testing.T, db tmdb.DB) {
 	verifyAndCloseIterator(t, ritr, []int64(nil), "reverse iterator from 2 (ex) to 4")
 }
 
+// Test `CONTRACT: No writes may happen within a domain while an iterator exists over it.`
+func TestDBIteratorNoWrites(t *testing.T, db tmdb.DB) {
+	for i := 0; i < 10; i++ {
+		if i != 6 { // but skip 6.
+			err := db.Set(Int642Bytes(int64(i)), []byte{})
+			require.NoError(t, err)
+		}
+	}
+
+	itr, err := db.Iterator(nil, nil)
+	require.NoError(t, err)
+
+	err = db.Set(Int642Bytes(int64(6)), []byte{})
+	require.NoError(t, err)
+
+	exist6, err := db.Has(Int642Bytes(int64(6)))
+	require.True(t, exist6)
+
+	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")
+}
+
 func TestDBEmptyIterator(t *testing.T, db tmdb.DB) {
 	itr, err := db.Iterator(nil, nil)
 	require.NoError(t, err)
