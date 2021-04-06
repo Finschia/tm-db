@@ -36,17 +36,21 @@ test-badgerdb:
 	@echo "--> Running go test"
 	@go test ./badgerdb/... -tags badgerdb -v
 
+test-prefixdb:
+	@echo "--> Running go test"
+	@go test ./prefixdb/... -tags prefixdb -v
+
 test-remotedb:
 	@echo "--> Running go test"
 	@go test ./remotedb/... -tags goleveldb,remotedb -v
 
 test-all:
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb -v
+	@go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,prefixdb,remotedb -v
 
 test-all-docker:
 	@echo "--> Running go test"
-	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb -v
+	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,prefixdb,remotedb -v
 .PHONY: test-all-docker
 
 bench:
@@ -70,14 +74,17 @@ bench-boltdb:
 bench-badgerdb:
 	@go test -bench=. ./badgerdb/... -tags badgerdb
 
+bench-prefixdb:
+	@go test -bench=. ./prefixdb/... -tags prefixdb
+
 bench-remotedb:
 	@go test -bench=. ./remotedb/... -tags goleveldb,remotedb
 
 bench-all:
-	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
+	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,prefixdb,remotedb
 
 bench-all-docker:
-	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,remotedb
+	@docker run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/docker-tm-db-testing go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,prefixdb,remotedb
 .PHONY: bench-all-docker
 
 lint:
