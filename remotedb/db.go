@@ -116,7 +116,7 @@ func (rd *RemoteDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (rd *RemoteDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (rd *RemoteDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (rd *RemoteDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}

@@ -184,7 +184,7 @@ func (db *CLevelDB) Iterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *CLevelDB) PrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}
@@ -202,7 +202,7 @@ func (db *CLevelDB) ReverseIterator(start, end []byte) (tmdb.Iterator, error) {
 }
 
 func (db *CLevelDB) ReversePrefixIterator(prefix []byte) (tmdb.Iterator, error) {
-	start, end, err := util.PrefixRange(prefix)
+	start, end, err := util.PrefixToRange(prefix)
 	if err != nil {
 		return nil, err
 	}
