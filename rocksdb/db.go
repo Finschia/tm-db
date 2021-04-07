@@ -93,10 +93,7 @@ func (db *RocksDB) Set(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(db.wo, key, value); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(db.wo, key, value)
 }
 
 // SetSync implements DB.
@@ -107,10 +104,7 @@ func (db *RocksDB) SetSync(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(db.woSync, key, value); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(db.woSync, key, value)
 }
 
 // Delete implements DB.
@@ -118,10 +112,7 @@ func (db *RocksDB) Delete(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	if err := db.db.Delete(db.wo, key); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(db.wo, key)
 }
 
 // DeleteSync implements DB.
@@ -129,10 +120,7 @@ func (db *RocksDB) DeleteSync(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	if err := db.db.Delete(db.woSync, key); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(db.woSync, key)
 }
 
 // FIXME This should not be exposed
