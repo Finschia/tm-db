@@ -31,6 +31,8 @@ func NewDB(name string, dir string) (*CLevelDB, error) {
 	opts := levigo.NewOptions()
 	opts.SetCache(levigo.NewLRUCache(1 << 30))
 	opts.SetCreateIfMissing(true)
+	defer opts.Close()
+
 	db, err := levigo.Open(dbPath, opts)
 	if err != nil {
 		return nil, err
