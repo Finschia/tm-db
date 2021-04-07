@@ -65,10 +65,7 @@ func (db *GoLevelDB) Set(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(key, value, nil); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(key, value, nil)
 }
 
 // SetSync implements DB.
@@ -79,10 +76,7 @@ func (db *GoLevelDB) SetSync(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(key, value, &opt.WriteOptions{Sync: true}); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(key, value, &opt.WriteOptions{Sync: true})
 }
 
 // Delete implements DB.
@@ -90,10 +84,7 @@ func (db *GoLevelDB) Delete(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	if err := db.db.Delete(key, nil); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(key, nil)
 }
 
 // DeleteSync implements DB.
@@ -101,11 +92,7 @@ func (db *GoLevelDB) DeleteSync(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	err := db.db.Delete(key, &opt.WriteOptions{Sync: true})
-	if err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(key, &opt.WriteOptions{Sync: true})
 }
 
 func (db *GoLevelDB) DB() *leveldb.DB {
@@ -114,10 +101,7 @@ func (db *GoLevelDB) DB() *leveldb.DB {
 
 // Close implements DB.
 func (db *GoLevelDB) Close() error {
-	if err := db.db.Close(); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Close()
 }
 
 // Print implements DB.

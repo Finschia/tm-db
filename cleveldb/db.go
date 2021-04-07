@@ -53,11 +53,7 @@ func (db *CLevelDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, tmdb.ErrKeyEmpty
 	}
-	res, err := db.db.Get(db.ro, key)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+	return db.db.Get(db.ro, key)
 }
 
 // Has implements DB.
@@ -77,10 +73,7 @@ func (db *CLevelDB) Set(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(db.wo, key, value); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(db.wo, key, value)
 }
 
 // SetSync implements DB.
@@ -91,10 +84,7 @@ func (db *CLevelDB) SetSync(key []byte, value []byte) error {
 	if value == nil {
 		return tmdb.ErrValueNil
 	}
-	if err := db.db.Put(db.woSync, key, value); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Put(db.woSync, key, value)
 }
 
 // Delete implements DB.
@@ -102,10 +92,7 @@ func (db *CLevelDB) Delete(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	if err := db.db.Delete(db.wo, key); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(db.wo, key)
 }
 
 // DeleteSync implements DB.
@@ -113,10 +100,7 @@ func (db *CLevelDB) DeleteSync(key []byte) error {
 	if len(key) == 0 {
 		return tmdb.ErrKeyEmpty
 	}
-	if err := db.db.Delete(db.woSync, key); err != nil {
-		return err
-	}
-	return nil
+	return db.db.Delete(db.woSync, key)
 }
 
 // FIXME This should not be exposed
