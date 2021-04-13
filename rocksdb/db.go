@@ -69,20 +69,19 @@ func (db *RocksDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, tmdb.ErrKeyEmpty
 	}
-	res, err := db.db.Get(db.ro, key)
-	if err != nil {
-		return nil, err
-	}
-	return moveSliceToBytes(res), nil
+	return db.db.GetBytes(db.ro, key)
 }
 
 // Has implements DB.
 func (db *RocksDB) Has(key []byte) (bool, error) {
-	bytes, err := db.Get(key)
+	s, err := db.db.Get(db.ro, key)
+	if s != nil {
+		defer s.Free()
+	}
 	if err != nil {
 		return false, err
 	}
-	return bytes != nil, nil
+	return s.Exists(), nil
 }
 
 // Set implements DB.
