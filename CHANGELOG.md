@@ -1,162 +1,38 @@
 # Changelog
 
-## 0.6.4
-
-**2021-02-09**
-
-Bump protobuf to 1.3.2 and grpc to 1.35.0.
-
-## 0.6.3
-
-**2020-11-10**
-
-### Improvements
-
-- [goleveldb] [\#134](https://github.com/tendermint/tm-db/pull/134) Improve iterator performance by bounding underlying iterator range (@klim0v)
-
-## 0.6.2
-
-**2020-08-27**
-
-Bump grpc, badger and goleveldb (see versions in go.mod file)
-
-## 0.6.1
-
-**2020-08-12**
-
-### Improvements
-
-- [\#115](https://github.com/tendermint/tm-db/pull/115) Add a `BadgerDB` backend with build tag `badgerdb` (@mvdan)
-
-## 0.6.0
-
-**2020-06-24**
-
-### Breaking Changes
-
-- [\#99](https://github.com/tendermint/tm-db/pull/99) Keys can no longer be `nil` or empty, and values can no longer be `nil` (@erikgrinaker)
-
-- [\#98](https://github.com/tendermint/tm-db/pull/98) `NewDB` now returns an error instead of panicing (@erikgrinaker)
-
-- [\#96](https://github.com/tendermint/tm-db/pull/96) `Batch.Set()`, `Delete()`, and `Close()` may now error (@erikgrinaker)
-
-- [\#97](https://github.com/tendermint/tm-db/pull/97) `Iterator.Close()` may now error (@erikgrinaker)
-
-- [\#97](https://github.com/tendermint/tm-db/pull/97) Many iterator panics are now exposed via `Error()` instead (@erikgrinaker)
-
-- [\#96](https://github.com/tendermint/tm-db/pull/96) The `SetDeleter` interface has been removed (@erikgrinaker)
-
-### Bug Fixes
-
-- [\#97](https://github.com/tendermint/tm-db/pull/97) `RemoteDB` iterators are now correctly primed with the first item when created, without calling `Next()` (@erikgrinaker)
-
-## 0.5.2
-
-**2020-11-10**
-
-### Improvements
-
-- [goleveldb] [\#134](https://github.com/tendermint/tm-db/pull/134) Improve iterator performance by bounding underlying iterator range (@klim0v)
-
-## 0.5.1
-
-**2020-03-30**
-
-### Bug Fixes
-
-- [boltdb] [\#81](https://github.com/tendermint/tm-db/pull/81) Use correct import path go.etcd.io/bbolt
-
-## 0.5.0
-
-**2020-03-11**
-
-### Breaking Changes
-
-- [\#71](https://github.com/tendermint/tm-db/pull/71) Closed or written batches can no longer be reused, all non-`Close()` calls will panic
-
-- [memdb] [\#74](https://github.com/tendermint/tm-db/pull/74) `Iterator()` and `ReverseIterator()` now take out database read locks for the duration of the iteration
-
-- [memdb] [\#56](https://github.com/tendermint/tm-db/pull/56) Removed some exported methods that were mainly meant for internal use: `Mutex()`, `SetNoLock()`, `SetNoLockSync()`, `DeleteNoLock()`, and `DeleteNoLockSync()`
-
-### Improvements
-
-- [memdb] [\#53](https://github.com/tendermint/tm-db/pull/53) Use a B-tree for storage, which significantly improves range scan performance
-
-- [memdb] [\#56](https://github.com/tendermint/tm-db/pull/56) Use an RWMutex for improved performance with highly concurrent read-heavy workloads
-
-### Bug Fixes
-
-- [boltdb] [\#69](https://github.com/tendermint/tm-db/pull/69) Properly handle blank keys in iterators
-
-- [cleveldb] [\#65](https://github.com/tendermint/tm-db/pull/65) Fix handling of empty keys as iterator endpoints
-
-## 0.4.1
-
-**2020-2-26**
-
-### Breaking Changes
-
-- [fsdb] [\#43](https://github.com/tendermint/tm-db/pull/43) Remove FSDB
-
-### Bug Fixes
-
-- [boltdb] [\#45](https://github.com/tendermint/tm-db/pull/45) Bring BoltDB to adhere to the db interfaces
-
-## 0.4
-
-**2020-1-7**
-
-### BREAKING CHANGES
-
-- [\#30](https://github.com/tendermint/tm-db/pull/30) Interface Breaking, Interfaces return errors instead of panic:
-  - Changes to function signatures:
-    - DB interface:
-      - `Get([]byte) ([]byte, error)`
-      - `Has(key []byte) (bool, error)`
-      - `Set([]byte, []byte) error`
-      - `SetSync([]byte, []byte) error`
-      - `Delete([]byte) error`
-      - `DeleteSync([]byte) error`
-      - `Iterator(start, end []byte) (Iterator, error)`
-      - `ReverseIterator(start, end []byte) (Iterator, error)`
-      - `Close() error`
-      - `Print() error`
-    - Batch interface:
-      - `Write() error`
-      - `WriteSync() error`
-    - Iterator interface:
-      - `Error() error`
-
-### IMPROVEMENTS
-
-- [remotedb] [\#34](https://github.com/tendermint/tm-db/pull/34) Add proto file tests and regenerate remotedb.pb.go
-
-## 0.3
-
-**2019-11-18**
-
-Special thanks to external contributors on this release:
-
-### BREAKING CHANGES
-
-- [\#26](https://github.com/tendermint/tm-db/pull/26/files) Rename `DBBackendtype` to `BackendType`
-
-## 0.2
-
-**2019-09-19**
-
-Special thanks to external contributors on this release: @stumble
+## [Unreleased]
 
 ### Features
+* (cleveldb/rocksdb) [\#3](https://github.com/line/tm-db/pull/3) Make path for cleveldb, rocksdb
+* (prefix) [\#10](https://github.com/line/tm-db/pull/10) Prefix iterator (#10)
+* (api) [\#15](https://github.com/line/tm-db/pull/15) Add AvailableDBBackends function (#15)
 
-- [\#12](https://github.com/tendermint/tm-db/pull/12) Add `RocksDB` (@stumble)
+### Improvements
+* (global) [\#1](https://github.com/line/tm-db/pull/1) Revise module path
+* (perf) [\#4](https://github.com/line/tm-db/pull/4) Optimize 2 `[]byte`s concatenation (#4)
+* (prefixdb) [\#6](https://github.com/line/tm-db/pull/6) Package `prefixdb` (#6)
+* (badgerdb) [\#8](https://github.com/line/tm-db/pull/8) Re-org badgerdb files to follow up convention (#8)
+* (perf) [\#9](https://github.com/line/tm-db/pull/9) Pointer receiver for cLevelDBIterator (#9)
+* (global) [\#11](https://github.com/line/tm-db/pull/11) Remove Iterator.Domain() (#11)
+* (goleveldb) [\#12](https://github.com/line/tm-db/pull/12) Revise goleveldb iterator (#12)
+* (prefixdb) [\#13](https://github.com/line/tm-db/pull/13) Revise `PrefixRange()` to return err as well (#13)
+* (perf) [\#14](https://github.com/line/tm-db/pull/14) Optimize cleveldb iterator (#14)
+* (rocksdb) [\#16](https://github.com/line/tm-db/pull/16) Revise rocksdb iterator (#16)
+* (prefixdb) [\#17](https://github.com/line/tm-db/pull/17) Revise prefixdb iterator (#17)
+* (test) [\#18](https://github.com/line/tm-db/pull/18) No writes on an iterator (#18)
+* (prefixdb) [\#19](https://github.com/line/tm-db/pull/19) Simplify prefixdb iterator and add tests (#19)
+* (perf) [\#20](https://github.com/line/tm-db/pull/20) Remote prefixdb.mtx (#20)
 
-## 0.1
+### Bug Fixes
+* (test) [\#5](https://github.com/line/tm-db/pull/5) Fix test (#5)
+* (test) [\#7](https://github.com/line/tm-db/pull/7) Revise test (#7)
 
-**2019-07-16**
+### Breaking Changes
 
-Special thanks to external contributors on this release:
+## [tendermint/tm-db v0.6.4] - 2021-03-15
+Initial line/tm-db is based on the tendermint/tm-db v0.6.4
 
-### Initial Release
+* (tendermint/tm-db) [v0.6.4](https://github.com/tendermint/tm-db/releases/tag/v0.6.4).
 
-- `db`, `random.go`, `bytes.go` and `os.go` from the tendermint repo.
+Please refer [CHANGELOG_OF_tendermint/tm-db_v0.6.4](https://github.com/tendermint/tm-db/blob/v0.6.4/CHANGELOG.md)
+<!-- Release links -->
