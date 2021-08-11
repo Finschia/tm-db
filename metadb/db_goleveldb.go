@@ -1,5 +1,3 @@
-// +build goleveldb
-
 package metadb
 
 import (
