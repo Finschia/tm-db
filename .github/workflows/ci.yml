@@ -2,7 +2,7 @@ name: Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   cleanup-runs:
@@ -15,7 +15,11 @@ jobs:
 
   Test:
     runs-on: ubuntu-latest
-    container: tendermintdev/docker-tm-db-testing
+    container:
+      image: line/tm-db-testing
+      credentials:
+         username: ${{ secrets.DOCKERHUB_USERNAME }}
+         password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: test & coverage report creation
