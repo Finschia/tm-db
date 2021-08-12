@@ -15,7 +15,7 @@ jobs:
 
   Test:
     runs-on: ubuntu-latest
-    container: tendermintdev/docker-tm-db-testing
+    container: lbmdev/docker-tm-db-testing
     steps:
       - uses: actions/checkout@v2
       - name: test & coverage report creation
