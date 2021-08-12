@@ -1,6 +1,6 @@
 name: Build & Push TM-DB-Testing
 on:
-  pull-request:
+  pull_request:
     branches:
       - main
     paths:
