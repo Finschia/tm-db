@@ -222,7 +222,8 @@ func TestDBIteratorNoWrites(t *testing.T, db tmdb.DB) {
 	err = db.Set(Int642Bytes(int64(6)), []byte{})
 	require.NoError(t, err)
 
-	exist6, err := db.Has(Int642Bytes(int64(6)))
+	exist6, err2 := db.Has(Int642Bytes(int64(6)))
+	require.NoError(t, err2)
 	require.True(t, exist6)
 
 	verifyAndCloseIterator(t, itr, []int64{0, 1, 2, 3, 4, 5, 7, 8, 9}, "forward iterator")

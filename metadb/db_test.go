@@ -156,7 +156,7 @@ func TestAvailableDBBackends(t *testing.T) {
 }
 
 func newTempDB(t *testing.T, backend BackendType) (db tmdb.DB, name, dir string) {
-	name, dir = dbtest.NewTestName(fmt.Sprintf("%s", backend))
+	name, dir = dbtest.NewTestName(string(backend))
 	db, err := NewDB(name, backend, dir)
 	require.NoError(t, err)
 	return db, name, dir
