@@ -2,7 +2,7 @@ name: Test
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   cleanup-runs:
@@ -11,11 +11,15 @@ jobs:
       - uses: rokroskar/workflow-run-cleanup-action@master
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/master'"
+    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/main'"
 
   Test:
     runs-on: ubuntu-latest
-    container: tendermintdev/docker-tm-db-testing
+    container:
+      image: line/tm-db-testing
+      credentials:
+         username: ${{ secrets.DOCKERHUB_USERNAME }}
+         password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: test & coverage report creation
