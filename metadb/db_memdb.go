@@ -1,5 +1,3 @@
-// +build memdb
-
 package metadb
 
 import (
