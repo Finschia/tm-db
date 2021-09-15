@@ -7,7 +7,7 @@ on:
 
 jobs:
   golangci:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     container:
       image: line/tm-db-testing
       credentials:
