@@ -1,0 +1,6 @@
+name: 'Docker Container Action'
+description: 'Container action for tm-db testing'
+runs:
+  using: 'docker'
+  image: '../../tools/Dockerfile'
+  entrypoint: ${{ inputs.cmd }}

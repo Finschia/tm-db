@@ -28,3 +28,5 @@ RUN \
   && ldconfig \
   && cd .. \
   && rm -rf v6.20.3.tar.gz rocksdb-6.20.3
+
+ENTRYPOINT ["/bin/bash"]

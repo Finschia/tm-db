@@ -15,16 +15,13 @@ jobs:
 
   Test:
     runs-on: self-hosted
-    container:
-      image: line/tm-db-testing
-      credentials:
-         username: ${{ secrets.DOCKERHUB_USERNAME }}
-         password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: test & coverage report creation
-        run: |
-          go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb -v
+        uses: ./
+        with:
+          cmd: |
+            go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags=memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb -v
       - uses: codecov/codecov-action@v1
         with:
           file: ./coverage.txt
