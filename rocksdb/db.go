@@ -69,7 +69,11 @@ func (db *RocksDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, tmdb.ErrKeyEmpty
 	}
-	return db.db.GetBytes(db.ro, key)
+	res, err := db.db.Get(db.ro, key)
+	if err != nil {
+		return nil, err
+	}
+	return moveSliceToBytes(res), nil
 }
 
 // Has implements DB.
