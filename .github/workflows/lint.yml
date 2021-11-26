@@ -12,7 +12,7 @@ jobs:
       image: line/tm-db-testing
       credentials:
          username: ${{ secrets.DOCKERHUB_USERNAME }}
-         password: ${{ secrets.DOCKERHUB_TOKEN }}
+         password: ${{ secrets.TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: golangci/golangci-lint-action@v2.4.0
