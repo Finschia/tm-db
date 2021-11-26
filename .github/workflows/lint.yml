@@ -11,7 +11,7 @@ jobs:
     container:
       image: line/tm-db-testing
       credentials:
-         username: ${{ secrets.DOCKERHUB_USERNAME }}
+         username: ${{ secrets.token }}
          password: xxxxx
     steps:
       - uses: actions/checkout@v2
