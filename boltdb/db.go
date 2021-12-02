@@ -56,6 +56,10 @@ func NewDBWithOpts(name string, dir string, opts *bbolt.Options) (tmdb.DB, error
 	return &BoltDB{db: db}, nil
 }
 
+func (bdb *BoltDB) Name() string {
+	return "boltdb"
+}
+
 // Get implements DB.
 func (bdb *BoltDB) Get(key []byte) (value []byte, err error) {
 	if len(key) == 0 {

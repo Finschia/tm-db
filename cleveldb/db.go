@@ -11,6 +11,7 @@ import (
 
 // CLevelDB uses the C LevelDB database via a Go wrapper.
 type CLevelDB struct {
+	name   string
 	db     *levigo.DB
 	ro     *levigo.ReadOptions
 	wo     *levigo.WriteOptions
@@ -42,12 +43,17 @@ func NewDB(name string, dir string) (*CLevelDB, error) {
 	woSync := levigo.NewWriteOptions()
 	woSync.SetSync(true)
 	database := &CLevelDB{
+		name:   dbPath,
 		db:     db,
 		ro:     ro,
 		wo:     wo,
 		woSync: woSync,
 	}
 	return database, nil
+}
+
+func (db *CLevelDB) Name() string {
+	return db.name
 }
 
 // Get implements DB.

@@ -41,6 +41,10 @@ func NewDBWithOptions(opts badger.Options) (*BadgerDB, error) {
 	return &BadgerDB{db: db}, nil
 }
 
+func (b *BadgerDB) Name() string {
+	return "badgerdb"
+}
+
 func (b *BadgerDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {
 		return nil, tmdb.ErrKeyEmpty

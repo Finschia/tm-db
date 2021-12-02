@@ -19,6 +19,8 @@ var (
 // Keys cannot be nil or empty, while values cannot be nil. Keys and values should be considered
 // read-only, both when returned and when given, and must be copied before they are modified.
 type DB interface {
+	Name() string
+
 	// Get fetches the value of the given key, or nil if it does not exist.
 	// CONTRACT: key, value readonly []byte
 	Get([]byte) ([]byte, error)

@@ -64,6 +64,10 @@ func NewDBWithOptions(name string, dir string, opts *gorocksdb.Options) (*RocksD
 	return database, nil
 }
 
+func (db *RocksDB) Name() string {
+	return db.db.Name()
+}
+
 // Get implements DB.
 func (db *RocksDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {

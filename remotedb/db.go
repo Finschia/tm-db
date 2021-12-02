@@ -33,6 +33,10 @@ type Init struct {
 	Type string
 }
 
+func (rd *RemoteDB) Name() string {
+	return "remote"
+}
+
 func (rd *RemoteDB) InitRemote(in *Init) error {
 	_, err := rd.dc.Init(rd.ctx, &protodb.Init{Dir: in.Dir, Type: in.Type, Name: in.Name})
 	return err
