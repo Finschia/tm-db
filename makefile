@@ -28,6 +28,10 @@ test-rocksdb:
 	@echo "--> Running go test"
 	@go test ./rocksdb/... -tags rocksdb -v
 
+test-rdb:
+	@echo "--> Running go test"
+	@go test ./rdb/... -tags rocksdb -v
+
 test-boltdb:
 	@echo "--> Running go test"
 	@go test ./boltdb/... -tags boltdb -v

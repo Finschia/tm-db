@@ -41,6 +41,8 @@ const (
 	//   - EXPERIMENTAL
 	//   - use badgerdb build tag (go build -tags badgerdb)
 	BadgerDBBackend BackendType = "badgerdb"
+	// Alternative rocksdb
+	RDBBackend BackendType = "stonesdb"
 )
 
 type dbCreator func(name string, dir string) (tmdb.DB, error)
