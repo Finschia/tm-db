@@ -3,6 +3,7 @@ package rocksdb
 import (
 	"github.com/line/gorocksdb"
 	tmdb "github.com/line/tm-db/v2"
+	"github.com/line/tm-db/v2/internal/util"
 )
 
 type rocksDBIterator struct {
@@ -10,8 +11,8 @@ type rocksDBIterator struct {
 	opts      *gorocksdb.ReadOptions
 	isReverse bool
 	isInvalid bool
-	key       *gorocksdb.Slice
-	value     *gorocksdb.Slice
+	key       []byte
+	value     []byte
 }
 
 var _ tmdb.Iterator = (*rocksDBIterator)(nil)
@@ -69,25 +70,26 @@ func (itr *rocksDBIterator) invalidate() {
 func (itr *rocksDBIterator) Key() []byte {
 	itr.assertIsValid()
 	if itr.key == nil {
-		itr.key = itr.source.Key()
+		itr.key = moveSliceToBytes(itr.source.Key())
 	}
-	return itr.key.Data()
+	return itr.key
 }
 
 // Value implements Iterator.
 func (itr *rocksDBIterator) Value() []byte {
 	itr.assertIsValid()
 	if itr.value == nil {
-		itr.value = itr.source.Value()
+		itr.value = moveSliceToBytes(itr.source.Value())
 	}
-	return itr.value.Data()
+	return itr.value
 }
 
 // Next implements Iterator.
 func (itr *rocksDBIterator) Next() {
 	itr.assertIsValid()
 
-	itr.freeKeyValue()
+	itr.key = nil
+	itr.value = nil
 
 	if !itr.isReverse {
 		itr.source.Next()
@@ -111,23 +113,23 @@ func (itr *rocksDBIterator) Close() error {
 		itr.opts.Destroy()
 		itr.opts = nil
 	}
-	itr.freeKeyValue()
 	return nil
-}
-
-func (itr *rocksDBIterator) freeKeyValue() {
-	if itr.key != nil {
-		itr.key.Free()
-		itr.key = nil
-	}
-	if itr.value != nil {
-		itr.value.Free()
-		itr.value = nil
-	}
 }
 
 func (itr *rocksDBIterator) assertIsValid() {
 	if itr.isInvalid {
 		panic("iterator is invalid")
 	}
+}
+
+// moveSliceToBytes will free the slice and copy out a go []byte
+// This function can be applied on *Slice returned from Key() and Value()
+// of an Iterator, because they are marked as freed.
+func moveSliceToBytes(s *gorocksdb.Slice) []byte {
+	var bz []byte
+	if s.Exists() {
+		bz = util.Cp(s.Data())
+	}
+	s.Free()
+	return bz
 }
