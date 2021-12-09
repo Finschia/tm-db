@@ -101,6 +101,9 @@ type Batch interface {
 	// methods will error.
 	WriteSync() error
 
+	// WriteLowPri write the batch with lower priority
+	WriteLowPri() error
+
 	// Close closes the batch. It is idempotent, but calls to other methods afterwards will error.
 	Close() error
 }

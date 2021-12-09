@@ -75,6 +75,19 @@ func (b *rdbBatch) WriteSync() error {
 	return nil
 }
 
+func (b *rdbBatch) WriteLowPri() error {
+	if b.b == nil {
+		return tmdb.ErrBatchClosed
+	}
+	var cerr *C.char
+	C.rocksdb_write(b.db.db, b.db.wlpopts, b.b, &cerr)
+	if cerr != nil {
+		return cerror(cerr)
+	}
+	b.Close()
+	return nil
+}
+
 func (b *rdbBatch) Close() error {
 	if b.b != nil {
 		C.rocksdb_writebatch_destroy(b.b)

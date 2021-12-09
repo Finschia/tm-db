@@ -19,12 +19,14 @@ import (
 )
 
 type RDB struct {
+	name   string
 	fn     string
 	db     *C.rocksdb_t
 	opts   *C.rocksdb_options_t
 	ropts  *C.rocksdb_readoptions_t
 	wopts  *C.rocksdb_writeoptions_t
 	wsopts *C.rocksdb_writeoptions_t
+	wlpopts *C.rocksdb_writeoptions_t
 }
 
 type rdbIterator struct {
@@ -67,31 +69,38 @@ func NewDB(name string, dir string) (*RDB, error) {
 	C.rocksdb_options_set_create_if_missing(opts, 1)
 	C.rocksdb_options_increase_parallelism(opts, C.int(runtime.NumCPU()))
 	C.rocksdb_options_optimize_level_style_compaction(opts, 512*1024*1024)
+	C.rocksdb_options_optimize_level_style_compaction(opts, 512*1024*1024)
+	C.rocksdb_options_set_enable_pipelined_write(opts, 1)
 
 	ropts := C.rocksdb_readoptions_create()
 	wopts := C.rocksdb_writeoptions_create()
 	wsopts := C.rocksdb_writeoptions_create()
 	C.rocksdb_writeoptions_set_sync(wsopts, C.uchar(1))
+	wlpopts := C.rocksdb_writeoptions_create()
+	C.rocksdb_writeoptions_set_low_pri(wlpopts, C.uchar(1))
 
 	db := C.rocksdb_open(opts, b2c([]byte(fn)), &cerr)
 	if cerr != nil {
 		C.rocksdb_options_destroy(opts)
 		C.rocksdb_writeoptions_destroy(wopts)
 		C.rocksdb_writeoptions_destroy(wsopts)
+		C.rocksdb_writeoptions_destroy(wlpopts)
 		return nil, cerror(cerr)
 	}
 	return &RDB{
+		name:   name,
 		fn:     fn,
 		db:     db,
 		opts:   opts,
 		ropts:  ropts,
 		wopts:  wopts,
 		wsopts: wsopts,
+		wlpopts: wlpopts,
 	}, nil
 }
 
 func (db *RDB) Name() string {
-	return db.fn
+	return db.name
 }
 
 func (db *RDB) Get(key []byte) ([]byte, error) {
@@ -173,6 +182,7 @@ func (db *RDB) Close() error {
 	C.rocksdb_readoptions_destroy(db.ropts)
 	C.rocksdb_writeoptions_destroy(db.wopts)
 	C.rocksdb_writeoptions_destroy(db.wsopts)
+	C.rocksdb_writeoptions_destroy(db.wlpopts)
 	C.rocksdb_close(db.db)
 	return nil
 }

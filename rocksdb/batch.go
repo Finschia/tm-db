@@ -73,6 +73,20 @@ func (b *rocksDBBatch) WriteSync() error {
 	return b.Close()
 }
 
+// WriteLowPri implements Batch.
+func (b *rocksDBBatch) WriteLowPri() error {
+	if b.batch == nil {
+		return tmdb.ErrBatchClosed
+	}
+	err := b.db.db.Write(b.db.woLowPri, b.batch)
+	if err != nil {
+		return err
+	}
+	// Make sure batch cannot be used afterwards. Callers should still call Close(), for errors.
+	b.Close()
+	return nil
+}
+
 // Close implements Batch.
 func (b *rocksDBBatch) Close() error {
 	if b.batch != nil {

@@ -1,6 +1,7 @@
 package badgerdb
 
 import (
+	"path"
 	"path/filepath"
 
 	"github.com/dgraph-io/badger/v2"
@@ -9,7 +10,8 @@ import (
 )
 
 type BadgerDB struct {
-	db *badger.DB
+	name string
+	db   *badger.DB
 }
 
 var _ tmdb.DB = (*BadgerDB)(nil)
@@ -38,11 +40,11 @@ func NewDBWithOptions(opts badger.Options) (*BadgerDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &BadgerDB{db: db}, nil
+	return &BadgerDB{name: path.Base(opts.Dir), db: db}, nil
 }
 
 func (b *BadgerDB) Name() string {
-	return "badgerdb"
+	return b.name
 }
 
 func (b *BadgerDB) Get(key []byte) ([]byte, error) {

@@ -28,7 +28,7 @@ func NewDB(db tmdb.DB, prefix []byte) *PrefixDB {
 }
 
 func (pdb *PrefixDB) Name() string {
-	return fmt.Sprintf("prefix(%s, %s)", pdb.db.Name(), pdb.prefix)
+	return fmt.Sprintf("%s->%s", pdb.db.Name(), pdb.prefix)
 }
 
 // Get implements DB.

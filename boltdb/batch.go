@@ -93,6 +93,11 @@ func (b *boltDBBatch) WriteSync() error {
 	return b.Write()
 }
 
+// WriteLowPri implements Batch.
+func (b *boltDBBatch) WriteLowPri() error {
+	return b.Write()
+}
+
 // Close implements Batch.
 func (b *boltDBBatch) Close() error {
 	b.ops = nil

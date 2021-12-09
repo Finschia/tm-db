@@ -60,7 +60,7 @@ func NewDB() *MemDB {
 }
 
 func (db *MemDB) Name() string {
-	return "memdb"
+	return "nameless-memdb"
 }
 
 // Get implements DB.
