@@ -18,6 +18,11 @@ test: cleveldb rocksdb.build
 	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
 		go test $(PACKAGES) -tags memdb,goleveldb -v
 
+test-ci: cleveldb rocksdb.build
+	@echo "--> Running go test"
+	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
+		go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb -v
+
 test-memdb:
 	@echo "--> Running go test"
 	@go test ./memdb/... -tags memdb -v
