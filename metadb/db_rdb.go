@@ -3,7 +3,6 @@
 package metadb
 
 import (
-	"fmt"
 	tmdb "github.com/line/tm-db/v2"
 	"github.com/line/tm-db/v2/rdb"
 )
