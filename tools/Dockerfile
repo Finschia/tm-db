@@ -3,7 +3,8 @@ FROM golang
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-  libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev libzstd-dev make tar wget
+  libgflags-dev libsnappy-dev zlib1g-dev libbz2-dev libzstd-dev \
+  make cmake tar wget
 
 # Install cleveldb
 RUN \
