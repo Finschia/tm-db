@@ -6,6 +6,7 @@
 * (cleveldb/rocksdb) [\#3](https://github.com/line/tm-db/pull/3) Make path for cleveldb, rocksdb
 * (prefix) [\#10](https://github.com/line/tm-db/pull/10) Prefix iterator (#10)
 * (api) [\#15](https://github.com/line/tm-db/pull/15) Add AvailableDBBackends function (#15)
+* (rdb) [\#34](https://github.com/line/tm-db/pull/34) Name & WriteLowPri methods (#34)
 
 ### Improvements
 * (global) [\#1](https://github.com/line/tm-db/pull/1) Revise module path
