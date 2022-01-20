@@ -118,10 +118,8 @@ cleveldb:
 	fi
 	@if [ ! -e $(CLEVELDB_DIR)/libcleveldb.a ]; then   \
 		cd $(CLEVELDB_DIR);                        \
-		mkdir build;                               \
-		cd build;                                  \
-		cmake -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF ..; \
-		make;                                      \
+		cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF; \
+		cmake --build build;                                      \
 	fi
 
 rocksdb.build:

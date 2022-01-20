@@ -1,6 +1,5 @@
 set -e
 
-PWD=$(pwd)
 version="6.20.3"
 rocksdb="rocksdb"
 rocksdb_dir="rocksdb.build"
