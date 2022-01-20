@@ -55,10 +55,10 @@ func (b *rdbBatch) Write() error {
 	}
 	var cerr *C.char
 	C.rocksdb_write(b.db.db, b.db.wopts, b.b, &cerr)
+	b.Close()
 	if cerr != nil {
 		return cerror(cerr)
 	}
-	b.Close()
 	return nil
 }
 
@@ -68,10 +68,10 @@ func (b *rdbBatch) WriteSync() error {
 	}
 	var cerr *C.char
 	C.rocksdb_write(b.db.db, b.db.wsopts, b.b, &cerr)
+	b.Close()
 	if cerr != nil {
 		return cerror(cerr)
 	}
-	b.Close()
 	return nil
 }
 
@@ -81,10 +81,10 @@ func (b *rdbBatch) WriteLowPri() error {
 	}
 	var cerr *C.char
 	C.rocksdb_write(b.db.db, b.db.wlpopts, b.b, &cerr)
+	b.Close()
 	if cerr != nil {
 		return cerror(cerr)
 	}
-	b.Close()
 	return nil
 }
 
