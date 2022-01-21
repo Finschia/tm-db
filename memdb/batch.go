@@ -91,6 +91,11 @@ func (b *memDBBatch) WriteSync() error {
 	return b.Write()
 }
 
+// WriteLowPri implements Batch.
+func (b *memDBBatch) WriteLowPri() error {
+	return b.Write()
+}
+
 // Close implements Batch.
 func (b *memDBBatch) Close() error {
 	b.ops = nil

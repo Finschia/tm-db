@@ -50,6 +50,11 @@ func (pb prefixDBBatch) WriteSync() error {
 	return pb.source.WriteSync()
 }
 
+// WriteLowPri implements Batch.
+func (pb prefixDBBatch) WriteLowPri() error {
+	return pb.source.WriteLowPri()
+}
+
 // Close implements Batch.
 func (pb prefixDBBatch) Close() error {
 	return pb.source.Close()

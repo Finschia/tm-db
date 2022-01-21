@@ -21,7 +21,8 @@ var bucket = []byte("tm")
 // A single bucket ([]byte("tm")) is used per a database instance. This could
 // lead to performance issues when/if there will be lots of keys.
 type BoltDB struct {
-	db *bbolt.DB
+	name string
+	db   *bbolt.DB
 }
 
 var _ tmdb.DB = (*BoltDB)(nil)
@@ -53,7 +54,11 @@ func NewDBWithOpts(name string, dir string, opts *bbolt.Options) (tmdb.DB, error
 		return nil, err
 	}
 
-	return &BoltDB{db: db}, nil
+	return &BoltDB{name: name, db: db}, nil
+}
+
+func (bdb *BoltDB) Name() string {
+	return bdb.name
 }
 
 // Get implements DB.

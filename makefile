@@ -2,15 +2,21 @@ GOTOOLS = github.com/golangci/golangci-lint/cmd/golangci-lint
 PACKAGES=$(shell go list ./...)
 INCLUDE = -I=. -I=${GOPATH}/src -I=${GOPATH}/src/github.com/gogo/protobuf/protobuf
 
+CLEVELDB_DIR=$(shell pwd)/leveldb
+ROCKSDB_DIR=$(shell pwd)/rocksdb.build
+CGO_CFLAGS=-I$(CLEVELDB_DIR)/include -I$(ROCKSDB_DIR)/include
+CGO_LDFLAGS=-L$(CLEVELDB_DIR)/build -L$(ROCKSDB_DIR) -lleveldb -lrocksdb -lm -lstdc++ $(shell awk '/PLATFORM_LDFLAGS/ {sub("PLATFORM_LDFLAGS=", ""); print}' < $(ROCKSDB_DIR)/make_config.mk)
+
 export GO111MODULE = on
 
 all: lint test
 
 ### go tests
 ## By default this will only test memdb & goleveldb
-test:
+test: cleveldb rocksdb.build
 	@echo "--> Running go test"
-	@go test $(PACKAGES) -tags memdb,goleveldb -v
+	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
+		go test $(PACKAGES) -tags memdb,goleveldb -v
 
 test-memdb:
 	@echo "--> Running go test"
@@ -27,6 +33,10 @@ test-cleveldb:
 test-rocksdb:
 	@echo "--> Running go test"
 	@go test ./rocksdb/... -tags rocksdb -v
+
+test-rdb:
+	@echo "--> Running go test"
+	@go test ./rdb/... -tags rocksdb -v
 
 test-boltdb:
 	@echo "--> Running go test"
@@ -100,6 +110,25 @@ format:
 
 tools:
 	go get -v $(GOTOOLS)
+
+.PHONY: cleveldb rocksdb
+cleveldb:
+	@if [ ! -e $(CLEVELDB_DIR) ]; then         \
+		sh contrib/get_cleveldb.sh;        \
+	fi
+	@if [ ! -e $(CLEVELDB_DIR)/libcleveldb.a ]; then   \
+		cd $(CLEVELDB_DIR);                        \
+		cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DLEVELDB_BUILD_TESTS=OFF -DLEVELDB_BUILD_BENCHMARKS=OFF; \
+		cmake --build build;                                      \
+	fi
+
+rocksdb.build:
+	@if [ ! -e $(ROCKSDB_DIR) ]; then          \
+		sh ./contrib/get_rocksdb.sh;         \
+	fi
+	@if [ ! -e $(ROCKSDB_DIR)/librocksdb.a ]; then    \
+		cd $(ROCKSDB_DIR) && make -j4 static_lib; \
+	fi
 
 # generates certificates for TLS testing in remotedb
 gen_certs: clean_certs

@@ -59,6 +59,10 @@ func NewDB() *MemDB {
 	return database
 }
 
+func (db *MemDB) Name() string {
+	return "nameless-memdb"
+}
+
 // Get implements DB.
 func (db *MemDB) Get(key []byte) ([]byte, error) {
 	if len(key) == 0 {

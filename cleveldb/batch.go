@@ -74,6 +74,11 @@ func (b *cLevelDBBatch) WriteSync() error {
 	return nil
 }
 
+// WriteLowPri imelements Batch.
+func (b *cLevelDBBatch) WriteLowPri() error {
+	return b.Write()
+}
+
 // Close implements Batch.
 func (b *cLevelDBBatch) Close() error {
 	if b.batch != nil {

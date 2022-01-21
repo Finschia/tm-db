@@ -12,7 +12,8 @@ import (
 )
 
 type GoLevelDB struct {
-	db *leveldb.DB
+	name string
+	db   *leveldb.DB
 }
 
 var _ tmdb.DB = (*GoLevelDB)(nil)
@@ -28,9 +29,14 @@ func NewDBWithOpts(name string, dir string, o *opt.Options) (*GoLevelDB, error) 
 		return nil, err
 	}
 	database := &GoLevelDB{
-		db: db,
+		name: name,
+		db:   db,
 	}
 	return database, nil
+}
+
+func (db *GoLevelDB) Name() string {
+	return db.name
 }
 
 // Get implements DB.

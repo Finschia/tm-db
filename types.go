@@ -19,6 +19,8 @@ var (
 // Keys cannot be nil or empty, while values cannot be nil. Keys and values should be considered
 // read-only, both when returned and when given, and must be copied before they are modified.
 type DB interface {
+	Name() string
+
 	// Get fetches the value of the given key, or nil if it does not exist.
 	// CONTRACT: key, value readonly []byte
 	Get([]byte) ([]byte, error)
@@ -98,6 +100,9 @@ type Batch interface {
 	// WriteSync writes the batch and flushes it to disk. Only Close() can be called after, other
 	// methods will error.
 	WriteSync() error
+
+	// WriteLowPri write the batch with lower priority
+	WriteLowPri() error
 
 	// Close closes the batch. It is idempotent, but calls to other methods afterwards will error.
 	Close() error

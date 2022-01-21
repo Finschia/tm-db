@@ -74,6 +74,11 @@ func (b *batch) WriteSync() error {
 	return b.Close()
 }
 
+// WriteLowPri implements Batch.
+func (b *batch) WriteLowPri() error {
+	return b.Write()
+}
+
 // Close implements Batch.
 func (b *batch) Close() error {
 	b.ops = nil

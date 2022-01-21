@@ -12,25 +12,31 @@ import (
 )
 
 type RemoteDB struct {
-	ctx context.Context
-	dc  protodb.DBClient
+	name string
+	ctx  context.Context
+	dc   protodb.DBClient
 }
 
 func NewDB(serverAddr string, serverKey string) (*RemoteDB, error) {
-	return newDB(grpcdb.NewClient(serverAddr, serverKey))
+	gdc, err := grpcdb.NewClient(serverAddr, serverKey)
+	return newDB(fmt.Sprintf("%s://%s", serverAddr, serverKey), gdc, err)
 }
 
-func newDB(gdc protodb.DBClient, err error) (*RemoteDB, error) {
+func newDB(name string, gdc protodb.DBClient, err error) (*RemoteDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &RemoteDB{dc: gdc, ctx: context.Background()}, nil
+	return &RemoteDB{name: name, dc: gdc, ctx: context.Background()}, nil
 }
 
 type Init struct {
 	Dir  string
 	Name string
 	Type string
+}
+
+func (rd *RemoteDB) Name() string {
+	return rd.name
 }
 
 func (rd *RemoteDB) InitRemote(in *Init) error {

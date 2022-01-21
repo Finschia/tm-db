@@ -57,6 +57,11 @@ func (b *goLevelDBBatch) WriteSync() error {
 	return b.write(true)
 }
 
+// WriteLowPri implements Batch.
+func (b *goLevelDBBatch) WriteLowPri() error {
+	return b.Write()
+}
+
 func (b *goLevelDBBatch) write(sync bool) error {
 	if b.batch == nil {
 		return tmdb.ErrBatchClosed

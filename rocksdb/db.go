@@ -12,10 +12,12 @@ import (
 
 // RocksDB is a RocksDB backend.
 type RocksDB struct {
-	db     *gorocksdb.DB
-	ro     *gorocksdb.ReadOptions
-	wo     *gorocksdb.WriteOptions
-	woSync *gorocksdb.WriteOptions
+	name     string
+	db       *gorocksdb.DB
+	ro       *gorocksdb.ReadOptions
+	wo       *gorocksdb.WriteOptions
+	woSync   *gorocksdb.WriteOptions
+	woLowPri *gorocksdb.WriteOptions
 }
 
 var _ tmdb.DB = (*RocksDB)(nil)
@@ -55,13 +57,22 @@ func NewDBWithOptions(name string, dir string, opts *gorocksdb.Options) (*RocksD
 	wo := gorocksdb.NewDefaultWriteOptions()
 	woSync := gorocksdb.NewDefaultWriteOptions()
 	woSync.SetSync(true)
+	woLowPri := gorocksdb.NewDefaultWriteOptions()
+	// TODO: gorocksdb doesn't have rocksdb_writeoptions_set_low_pri() yet.
+	// woLowPri.SetLowPri(true)
 	database := &RocksDB{
-		db:     db,
-		ro:     ro,
-		wo:     wo,
-		woSync: woSync,
+		name:     name,
+		db:       db,
+		ro:       ro,
+		wo:       wo,
+		woSync:   woSync,
+		woLowPri: woLowPri,
 	}
 	return database, nil
+}
+
+func (db *RocksDB) Name() string {
+	return db.name
 }
 
 // Get implements DB.
