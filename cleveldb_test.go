@@ -36,9 +36,10 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 			idx := (int64(rand.Int()) % numItems)
 			internal[idx]++
 			val := internal[idx]
-			idxBytes := int642Bytes(int64(idx))
-			valBytes := int642Bytes(int64(val))
-			//fmt.Printf("Set %X -> %X\n", idxBytes, valBytes)
+			idxBytes := int642Bytes(idx)
+			valBytes := int642Bytes(val)
+			// fmt.Printf("Set %X -> %X\n", idxBytes, valBytes)
+			// nolint: errcheck
 			db.Set(
 				idxBytes,
 				valBytes,
@@ -48,7 +49,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 		{
 			idx := (int64(rand.Int()) % numItems)
 			val := internal[idx]
-			idxBytes := int642Bytes(int64(idx))
+			idxBytes := int642Bytes(idx)
 			valBytes, err := db.Get(idxBytes)
 			if err != nil {
 				b.Error(err)
