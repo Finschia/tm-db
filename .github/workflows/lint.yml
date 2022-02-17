@@ -23,5 +23,5 @@ jobs:
           # specified without patch version: we always use the latest patch
           # version.
           version: v1.30
-          args: --timeout 10m
+          args: --timeout 10m --build-tags "badgerdb,boltdb,cleveldb,goleveldb,memdb,remotedb,rocksdb,prefixdb"
           github-token: ${{ secrets.github_token }}
