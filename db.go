@@ -35,7 +35,7 @@ const (
 	RocksDBBackend BackendType = "rocksdb"
 
 	BadgerDBBackend BackendType = "badgerdb"
-	// Alternative rocksdb
+	// RDBBackend is an alternative rocksdb representation
 	RDBBackend BackendType = "stonesdb"
 )
 
