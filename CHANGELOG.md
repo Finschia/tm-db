@@ -2,6 +2,14 @@
 
 ## 0.6.6
 
+**2022-02-23**
+
+**Important node:** Line version was being developed on v0.6.5 line, that's
+been reverted to flat directory structure in v0.6.6. 
+
+### Breaking Changes
+* (line/tm-db) [\36](https://github.com/line/tm-db/pull/36) Merge v0.6.6
+
 **2021-11-08**
 
 **Important note:** Version v0.6.5 was accidentally tagged and should be
