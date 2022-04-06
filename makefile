@@ -20,39 +20,39 @@ test: cleveldb rocksdb.build
 
 test-memdb:
 	@echo "--> Running go test"
-	@go test ./memdb/... -tags memdb -v
+	@go test $(PACKAGES) -tags memdb -v
 
 test-goleveldb:
 	@echo "--> Running go test"
-	@go test ./goleveldb/... -tags goleveldb -v
+	@go test $(PACKAGES) -tags goleveldb -v
 
 test-cleveldb:
 	@echo "--> Running go test"
-	@go test ./cleveldb/... -tags cleveldb -v
+	@go test $(PACKAGES) -tags cleveldb -v
 
 test-rocksdb:
 	@echo "--> Running go test"
-	@go test ./rocksdb/... -tags rocksdb -v
+	@go test $(PACKAGES) -tags rocksdb -v
 
 test-rdb:
 	@echo "--> Running go test"
-	@go test ./rdb/... -tags rocksdb -v
+	@go test $(PACKAGES) -tags rocksdb -v
 
 test-boltdb:
 	@echo "--> Running go test"
-	@go test ./boltdb/... -tags boltdb -v
+	@go test $(PACKAGES) -tags boltdb -v
 
 test-badgerdb:
 	@echo "--> Running go test"
-	@go test ./badgerdb/... -tags badgerdb -v
+	@go test $(PACKAGES) -tags badgerdb -v
 
 test-prefixdb:
 	@echo "--> Running go test"
-	@go test ./prefixdb/... -tags prefixdb -v
+	@go test $(PACKAGES) -tags prefixdb -v
 
 test-remotedb:
 	@echo "--> Running go test"
-	@go test ./remotedb/... -tags goleveldb,remotedb -v
+	@go test $(PACKAGES) -tags goleveldb,remotedb -v
 
 test-all:
 	@echo "--> Running go test"
@@ -67,28 +67,28 @@ bench:
 	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb
 
 bench-memdb:
-	@go test -bench=. ./memdb/... -tags memdb
+	@go test -bench=. $(PACKAGES) -tags memdb
 
 bench-goleveldb:
-	@go test -bench=. ./goleveldb/... -tags goleveldb
+	@go test -bench=. $(PACKAGES) -tags goleveldb
 
 bench-cleveldb:
-	@go test -bench=. ./cleveldb/... -tags cleveldb
+	@go test -bench=. $(PACKAGES) -tags cleveldb
 
 bench-rocksdb:
-	@go test -bench=. ./rocksdb/... -tags rocksdb
+	@go test -bench=. $(PACKAGES) -tags rocksdb
 
 bench-boltdb:
-	@go test -bench=. ./boltdb/... -tags boltdb
+	@go test -bench=. $(PACKAGES) -tags boltdb
 
 bench-badgerdb:
-	@go test -bench=. ./badgerdb/... -tags badgerdb
+	@go test -bench=. $(PACKAGES) -tags badgerdb
 
 bench-prefixdb:
-	@go test -bench=. ./prefixdb/... -tags prefixdb
+	@go test -bench=. $(PACKAGES) -tags prefixdb
 
 bench-remotedb:
-	@go test -bench=. ./remotedb/... -tags goleveldb,remotedb
+	@go test -bench=. $(PACKAGES) -tags goleveldb,remotedb
 
 bench-all:
 	@go test -bench=. $(PACKAGES) -tags memdb,goleveldb,cleveldb,boltdb,rocksdb,badgerdb,prefixdb,remotedb

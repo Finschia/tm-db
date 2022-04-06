@@ -1,17 +1,17 @@
 package remotedb
 
 import (
-	tmdb "github.com/line/tm-db/v2"
+	db "github.com/line/tm-db/v2"
 	protodb "github.com/line/tm-db/v2/remotedb/proto"
 )
 
-func makeIterator(dic protodb.DB_IteratorClient) tmdb.Iterator {
+func makeIterator(dic protodb.DB_IteratorClient) db.Iterator {
 	itr := &iterator{dic: dic}
 	itr.Next() // We need to call Next to prime the iterator
 	return itr
 }
 
-func makeReverseIterator(dric protodb.DB_ReverseIteratorClient) tmdb.Iterator {
+func makeReverseIterator(dric protodb.DB_ReverseIteratorClient) db.Iterator {
 	rItr := &reverseIterator{dric: dric}
 	rItr.Next() // We need to call Next to prime the iterator
 	return rItr
@@ -23,7 +23,7 @@ type reverseIterator struct {
 	err  error
 }
 
-var _ tmdb.Iterator = (*iterator)(nil)
+var _ db.Iterator = (*iterator)(nil)
 
 // Valid implements Iterator.
 func (rItr *reverseIterator) Valid() bool {
@@ -67,7 +67,7 @@ func (rItr *reverseIterator) assertIsValid() {
 	}
 }
 
-// iterator implements the tmdb.Iterator by retrieving
+// iterator implements the db.Iterator by retrieving
 // streamed iterators from the remote backend as
 // needed. It is NOT safe for concurrent usage,
 // matching the behavior of other iterators.
@@ -77,7 +77,7 @@ type iterator struct {
 	err error
 }
 
-var _ tmdb.Iterator = (*iterator)(nil)
+var _ db.Iterator = (*iterator)(nil)
 
 // Valid implements Iterator.
 func (itr *iterator) Valid() bool {
