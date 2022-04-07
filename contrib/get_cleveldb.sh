@@ -1,10 +1,10 @@
 set -e
 
-version="1.23"
+version="1.20"
 leveldb="leveldb"
-archive="${version}.tar.gz"
+archive="v${version}.tar.gz"
 
 rm -rf ${leveldb} ${leveldb}-${archive}
-wget -O ${leveldb}-${archive} https://github.com/google/leveldb/archive/${archive}
+wget -q -O ${leveldb}-${archive} https://github.com/google/leveldb/archive/${archive}
 tar -zxvf ${leveldb}-${archive}
 mv ${leveldb}-${version} ${leveldb}

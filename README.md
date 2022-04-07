@@ -1,10 +1,10 @@
-# Forked Tendermint DB for LFB SDK and Ostracon 
+# Forked Tendermint DB for LBM SDK and Ostracon 
 
-Common database interface for various database backends. This is forked for applications built on [Ostracon](https://github.com/line/ostracon), such as the [LFB SDK](https://github.com/line/lfb-sdk) from [Tendermint tm-db](https://github.com/tendermint/tm-db), but can be used independently of these as well.
+Common database interface for various database backends. This is forked for applications built on [Ostracon](https://github.com/line/ostracon), such as the [LBM SDK](https://github.com/line/lbm-sdk) from [Tendermint tm-db](https://github.com/tendermint/tm-db), but can be used independently of these as well.
 
 ### Minimum Go Version
 
-Go 1.15+
+Go 1.16+
 
 ## Supported Database Backends
 

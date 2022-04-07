@@ -13,15 +13,18 @@ jobs:
     container:
       image: line/tm-db-testing
       credentials:
-         username: ${{ secrets.DOCKERHUB_USERNAME }}
-         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
     steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
       - uses: actions/checkout@v2
-      - uses: golangci/golangci-lint-action@v2.5.2
+      - uses: golangci/golangci-lint-action@v3.1.0
         with:
           # Required: the version of golangci-lint is required and must be
           # specified without patch version: we always use the latest patch
           # version.
-          version: v1.30
-          args: --timeout 10m --build-tags "badgerdb,boltdb,goleveldb,memdb,remotedb,prefixdb"
+          version: v1.42.1
+          args: --timeout 10m --build-tags "cleveldb,boltdb,badgerdb" # ignore rocksdb
           github-token: ${{ secrets.github_token }}

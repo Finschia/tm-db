@@ -8,7 +8,7 @@
 been reverted to flat directory structure in v0.6.6. 
 
 ### Breaking Changes
-* (line/tm-db) [\36](https://github.com/line/tm-db/pull/36) Merge v0.6.6
+* (line/tm-db) [\#36](https://github.com/line/tm-db/pull/36) Merge v0.6.6
 
 **2021-11-08**
 

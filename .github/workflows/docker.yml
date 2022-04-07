@@ -1,5 +1,5 @@
 # This workflow builds and pushes a new version of the build container image
-# when the tools directory changes on master. Edit tools/Dockerfile.
+# when the tools directory changes on main. Edit tools/Dockerfile.
 #
 # This workflow does not push a new image until it is merged, so tests that
 # depend on changes in this image will not pass until this workflow succeeds.
@@ -61,7 +61,7 @@ jobs:
       - name: Publish to Docker Hub
         uses: docker/build-push-action@v2
         with:
-          context: ./tools
+          context: .
           file: ./tools/Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.prep.outputs.tags }}
@@ -72,4 +72,3 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-

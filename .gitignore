@@ -13,3 +13,9 @@
 
 .idea
 vendor/*
+
+##########
+
+/leveldb*
+/rocksdb*
+/test_*

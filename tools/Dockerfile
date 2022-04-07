@@ -1,5 +1,5 @@
 # This file defines the container image used to build and test tm-db in CI.
-# The CI workflows use the latest tag of tendermintdev/docker-tm-db-testing
+# The CI workflows use the latest tag of line/tm-db-testing
 # built from these settings.
 #
 # The jobs defined in the Build & Push workflow will build and update the image
@@ -7,7 +7,7 @@
 # updates here, merge the changes here first and let the image get updated (or
 # push a new version manually) before PRs that depend on them.
 
-FROM golang:1.17-bullseye AS build
+FROM golang:1.16-bullseye AS build
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
@@ -16,29 +16,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make tar wget
 
 FROM build AS install
-ARG LEVELDB=1.20
-ARG ROCKSDB=6.24.2
+
+COPY ./contrib/ ./contrib
 
 # Install cleveldb
 RUN \
-  wget -q https://github.com/google/leveldb/archive/v${LEVELDB}.tar.gz \
-  && tar xvf v${LEVELDB}.tar.gz \
-  && cd leveldb-${LEVELDB} \
+  ./contrib/get_cleveldb.sh \
+  && cd leveldb \
   && make \
   && cp -a out-static/lib* out-shared/lib* /usr/local/lib \
   && cd include \
   && cp -a leveldb /usr/local/include \
-  && ldconfig \
-  && cd ../.. \
-  && rm -rf v${LEVELDB}.tar.gz leveldb-${LEVELDB}
+  && ldconfig
 
 # Install Rocksdb
 RUN \
-  wget -q https://github.com/facebook/rocksdb/archive/v${ROCKSDB}.tar.gz \
-  && tar -zxf v${ROCKSDB}.tar.gz \
-  && cd rocksdb-${ROCKSDB} \
+  ./contrib/get_rocksdb.sh \
+  && cd rocksdb \
   && DEBUG_LEVEL=0 make -j4 shared_lib \
   && make install-shared \
-  && ldconfig \
-  && cd .. \
-  && rm -rf v${ROCKSDB}.tar.gz rocksdb-${ROCKSDB}
+  && ldconfig
+
+RUN rm -rf ./leveldb-*.tar.gz leveldb
+RUN rm -rf ./rocksdb-*.tar.gz rocksdb
+RUN rm -rf ./contrib
