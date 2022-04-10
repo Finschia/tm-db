@@ -114,7 +114,7 @@ func TestPrefixIteratorMatches1N(t *testing.T) {
 			// Bad!
 			checkNext(t, itr, false)
 
-			//Once invalid...
+			// Once invalid...
 			checkInvalid(t, itr)
 		})
 	}
@@ -150,4 +150,9 @@ func TestConcat(t *testing.T) {
 	require.Equal(t, prefix, concat(prefix, nil))
 	require.Equal(t, key, concat(nil, key))
 	require.Equal(t, []byte{}, concat(nil, nil))
+}
+
+// TestMakePath is made for lint
+func TestMakePath(t *testing.T) {
+	require.Nil(t, makePath(""))
 }

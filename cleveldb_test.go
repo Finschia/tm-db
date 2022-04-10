@@ -1,3 +1,4 @@
+//go:build cleveldb
 // +build cleveldb
 
 package db
@@ -54,7 +55,7 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 			if err != nil {
 				b.Error(err)
 			}
-			//fmt.Printf("Get %X -> %X\n", idxBytes, valBytes)
+			// fmt.Printf("Get %X -> %X\n", idxBytes, valBytes)
 			if val == 0 {
 				if !bytes.Equal(valBytes, nil) {
 					b.Errorf("Expected %v for %v, got %X",

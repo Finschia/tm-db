@@ -1,5 +1,3 @@
-// +build remotedb
-
 package remotedb_test
 
 import (
