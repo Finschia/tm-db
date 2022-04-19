@@ -12,11 +12,13 @@ on:
     branches:
       - main
     paths:
+      - "contrib/*"
       - "tools/*"
   push:
     branches:
       - main
     paths:
+      - "contrib/*"
       - "tools/*"
 
 jobs:
