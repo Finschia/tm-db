@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: line/tm-db-testing
+      env:
+        CGO_LDFLAGS: -lrocksdb
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -26,5 +28,5 @@ jobs:
           # specified without patch version: we always use the latest patch
           # version.
           version: v1.42.1
-          args: --timeout 10m --build-tags "cleveldb,boltdb,badgerdb" # ignore rocksdb
+          args: --timeout 10m --build-tags "cleveldb,rocksdb,boltdb,badgerdb"
           github-token: ${{ secrets.github_token }}

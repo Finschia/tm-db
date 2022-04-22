@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: line/tm-db-testing
+      env:
+        CGO_LDFLAGS: -lrocksdb
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -31,8 +33,8 @@ jobs:
       - name: test & coverage report creation
         run: |
           go test ./... -mod=readonly -timeout 8m -race -coverprofile=coverage.txt -covermode=atomic \
-          -tags=cleveldb,boltdb,badgerdb -v # ignore rocksdb
+          -tags=cleveldb,rocksdb,boltdb,badgerdb -v
       - uses: codecov/codecov-action@v2.0.3
         with:
           file: ./coverage.txt
-          fail_ci_if_error: true  
+          fail_ci_if_error: true
