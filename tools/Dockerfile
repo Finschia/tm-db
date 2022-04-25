@@ -40,3 +40,12 @@ RUN \
 RUN rm -rf ./leveldb-*.tar.gz leveldb
 RUN rm -rf ./rocksdb-*.tar.gz rocksdb
 RUN rm -rf ./contrib
+
+# Install golangci for CI
+RUN go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@v1.42.1
+
+# Download dependency modules for CI
+WORKDIR /workspace
+COPY go.mod go.sum ./
+RUN go mod download
+RUN rm -rf go.mod go.sum
