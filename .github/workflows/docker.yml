@@ -14,6 +14,9 @@ on:
       - "go.mod"
 
 env:
+  GOMODFILE: ./go.mod
+  TOOLSDIR: ./tools
+  CONTRIBDIR: ./contrib
   CACHE_DIR: /tmp/line/tm-db-testing
 
 jobs:
@@ -29,7 +32,7 @@ jobs:
       - name: Prepare
         id: prep
         run: |
-          HASH_GHE=${{ github.sha }}
+          HASH_GHE=${{ hashFiles(env.GOMODFILE, env.TOOLSDIR, env.CONTRIBDIR) }}
           VARIANT=$(TZ=UTC-9 date '+%Y%m')${HASH_GHE:0:7}
           NAME_TAR="${VARIANT}.tar"
           CACHE_FILE=${{ env.CACHE_DIR }}"/${NAME_TAR}"
@@ -92,7 +95,6 @@ jobs:
       - name: Save Docker Image for Lint/Test
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          rm -rf ${{ env.CACHE_DIR }}
           mkdir -p ${{ env.CACHE_DIR }}
           docker save -o ${{ steps.prep.outputs.CACHE_FILE }} ${{ steps.prep.outputs.TAG }}
 
