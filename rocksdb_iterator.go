@@ -4,12 +4,12 @@
 package db
 
 import (
-	"github.com/line/gorocksdb"
+	"github.com/linxGnu/grocksdb"
 )
 
 type rocksDBIterator struct {
-	source    *gorocksdb.Iterator
-	opts      *gorocksdb.ReadOptions
+	source    *grocksdb.Iterator
+	opts      *grocksdb.ReadOptions
 	isReverse bool
 	isInvalid bool
 	key       []byte
@@ -18,8 +18,8 @@ type rocksDBIterator struct {
 
 var _ Iterator = (*rocksDBIterator)(nil)
 
-func newRockDBRangeOptions(start, end []byte) *gorocksdb.ReadOptions {
-	ro := gorocksdb.NewDefaultReadOptions()
+func newRockDBRangeOptions(start, end []byte) *grocksdb.ReadOptions {
+	ro := grocksdb.NewDefaultReadOptions()
 	if start != nil {
 		ro.SetIterateLowerBound(start)
 	}
@@ -29,7 +29,7 @@ func newRockDBRangeOptions(start, end []byte) *gorocksdb.ReadOptions {
 	return ro
 }
 
-func newRocksDBIterator(source *gorocksdb.Iterator, opts *gorocksdb.ReadOptions, isReverse bool) *rocksDBIterator {
+func newRocksDBIterator(source *grocksdb.Iterator, opts *grocksdb.ReadOptions, isReverse bool) *rocksDBIterator {
 	if !isReverse {
 		source.SeekToFirst()
 	} else {
@@ -126,7 +126,7 @@ func (itr *rocksDBIterator) assertIsValid() {
 // moveSliceToBytes will free the slice and copy out a go []byte
 // This function can be applied on *Slice returned from Key() and Value()
 // of an Iterator, because they are marked as freed.
-func moveSliceToBytes(s *gorocksdb.Slice) []byte {
+func moveSliceToBytes(s *grocksdb.Slice) []byte {
 	var bz []byte
 	if s.Exists() {
 		bz = cp(s.Data())

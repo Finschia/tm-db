@@ -19,7 +19,7 @@ jobs:
     # To update the container image, see docker.yml.
     runs-on: ubuntu-latest
     container:
-      image: line/tm-db-testing
+      image: ghcr.io/faddat/cosmos
       env:
         CGO_LDFLAGS: -lrocksdb
       credentials:
