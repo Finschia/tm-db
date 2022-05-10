@@ -149,12 +149,13 @@ func (db *RocksDB) DB() *gorocksdb.DB {
 	return db.db
 }
 
+// FIXME Unsafe db.db.Close() with multiple calling
 // Close implements DB.
 func (db *RocksDB) Close() error {
-	db.db.Close()
 	db.ro.Destroy()
 	db.wo.Destroy()
 	db.woSync.Destroy()
+	db.db.Close()
 	return nil
 }
 
