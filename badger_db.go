@@ -23,7 +23,7 @@ func badgerDBCreator(dbName, dir string) (DB, error) {
 func NewBadgerDB(dbName, dir string) (*BadgerDB, error) {
 	// Since Badger doesn't support database names, we join both to obtain
 	// the final directory to use for the database.
-	path := filepath.Join(dir, dbName)
+	path := filepath.Join(dir, dbName+".db")
 
 	if err := makePath(path); err != nil {
 		return nil, err
