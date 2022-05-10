@@ -16,7 +16,7 @@ func TestRDBNewDB(t *testing.T) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, RDBBackend, dir)
-	defer cleanupDBDir(dir, name)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 	require.NoError(t, err)
 
 	_, ok := db.(*RDB)
@@ -27,7 +27,7 @@ func TestRDBStats(t *testing.T) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, RDBBackend, dir)
-	defer cleanupDBDir(dir, name)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 	require.NoError(t, err)
 
 	assert.NotEmpty(t, db.Stats())
@@ -37,7 +37,7 @@ func BenchmarkRDBRangeScans1M(b *testing.B) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, RDBBackend, dir)
-	defer cleanupDBDir(dir, name)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 	require.NoError(b, err)
 
 	benchmarkRangeScans(b, db, int64(1e6))
@@ -47,7 +47,7 @@ func BenchmarkRDBRangeScans10M(b *testing.B) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
 	db, err := NewDB(name, RDBBackend, dir)
-	defer cleanupDBDir(dir, name)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 	require.NoError(b, err)
 
 	benchmarkRangeScans(b, db, int64(10e6))
@@ -56,8 +56,8 @@ func BenchmarkRDBRangeScans10M(b *testing.B) {
 func BenchmarkRDBRandomReadsWrites(b *testing.B) {
 	name := fmt.Sprintf("test_%x", randStr(12))
 	dir := os.TempDir()
-	db, err := NewDB(name, RDBBackend, dir)
-	defer cleanupDBDir(dir, name)
+	db, err := NewRDB(name, dir)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 	require.NoError(b, err)
 
 	benchmarkRandomReadsWrites(b, db)
