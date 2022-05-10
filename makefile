@@ -71,12 +71,27 @@ bench-badgerdb:
 
 bench-all: build-cleveldb build-rocksdb
 	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
-	go test -bench=. $(PACKAGES) -tags cleveldb,rocksdb,boltdb,badgerdb
+	go test -bench=. $(PACKAGES) -tags cleveldb,rocksdb,boltdb,badgerdb -timeout 20m
 
 bench-all-docker:
 	@docker run --rm -e CGO_LDFLAGS="-lrocksdb" -v $(CURDIR):/workspace --workdir /workspace $(DOCKER_IMAGE) \
-	go test -bench=. $(PACKAGES) -tags cleveldb,rocksdb,boltdb,badgerdb
+	go test -bench=. $(PACKAGES) -tags cleveldb,rocksdb,boltdb,badgerdb -timeout 20m
 .PHONY: bench-all-docker
+
+bench-rw-all: build-cleveldb build-rocksdb
+	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
+	go test -bench=DBRandomReadsWrites github.com/line/tm-db/v2 -benchtime 10s -count 5 -timeout 20m \
+	-tags cleveldb,rocksdb,boltdb,badgerdb
+
+bench-scan1m-all: build-cleveldb build-rocksdb
+	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
+	go test -bench=DBRangeScans1M github.com/line/tm-db/v2 -benchtime 1s -count 1 \
+	-tags cleveldb,rocksdb,boltdb,badgerdb
+
+bench-scan10m-all: build-cleveldb build-rocksdb
+	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
+	go test -bench=DBRangeScans10M github.com/line/tm-db/v2 -benchtime 1s -count 1 \
+	-tags cleveldb,rocksdb,boltdb,badgerdb -timeout 20m
 
 lint:
 	@echo "--> Running linter"
