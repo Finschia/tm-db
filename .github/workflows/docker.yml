@@ -82,10 +82,10 @@ jobs:
           context: .
           file: ./tools/Dockerfile
           push: ${{ github.event_name == 'push' }}
+          load: ${{ github.event_name != 'push' }}
           tags: ${{ steps.prep.outputs.tag }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
-          load: true
 
       - name: Move cache
         run: |
