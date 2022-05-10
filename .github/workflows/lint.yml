@@ -1,17 +1,9 @@
 name: Lint with registered Docker Image
 on:
+  pull_request:
   push:
     branches:
       - main
-    paths:
-      - "!contrib/*"
-      - "!tools/*"
-      - "!go.mod"
-  pull_request:
-    paths:
-      - "!contrib/*"
-      - "!tools/*"
-      - "!go.mod"
   workflow_call:
     inputs:
       CACHE_DIR:
@@ -25,9 +17,25 @@ on:
         type: string
 
 jobs:
-  lint-with-registerd-docker-image:
+  changes:
     runs-on: ubuntu-latest
     if: ${{ inputs.CACHE_FILE == '' }}
+    outputs:
+      paths: ${{ steps.filter.outputs.paths }}
+    steps:
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            paths:
+              - "contrib/*"
+              - "tools/*"
+              - "go.mod"
+
+  lint-with-registerd-docker-image:
+    needs: changes
+    runs-on: ubuntu-latest
+    if: ${{ inputs.CACHE_FILE == '' && needs.changes.outputs.paths != 'true' }}
     container:
       image: line/tm-db-testing
       env:
