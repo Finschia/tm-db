@@ -91,6 +91,12 @@ lint-all: build-cleveldb build-rocksdb
 	@go mod verify
 .PHONY: lint-all
 
+lint-all-docker:
+	@echo "--> Running go lint"
+	@docker run --rm -e CGO_LDFLAGS="-lrocksdb" -v $(CURDIR):/workspace --workdir /workspace $(DOCKER_IMAGE) \
+	golangci-lint run --build-tags "cleveldb,rocksdb,boltdb,badgerdb"
+.PHONY: test-all-docker
+
 format:
 	find . -name '*.go' -type f -not -path "*.git*" -not -name '*.pb.go' -not -name '*pb_test.go' | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "*.git*"  -not -name '*.pb.go' -not -name '*pb_test.go' | xargs goimports -w
