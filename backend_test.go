@@ -26,6 +26,17 @@ func init() {
 	}, false)
 }
 
+func closeDBWithCleanupDBDir(db DB, dir, name string) {
+	defer cleanupDBDir(dir, name)
+	// MEMO:
+	// `RocksDB.Close()` happen `abort` with calling 2 times more in the same process
+	// `CGO.abort` cannot recover safety
+	err := db.Close()
+	if err != nil {
+		panic(err)
+	}
+}
+
 func cleanupDBDir(dir, name string) {
 	err := os.RemoveAll(filepath.Join(dir, name) + ".db")
 	if err != nil {
