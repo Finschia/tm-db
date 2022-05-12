@@ -47,6 +47,8 @@ jobs:
     if: ${{ inputs.CACHE_FILE == '' && needs.changes.outputs.paths != 'true' }}
     container:
       image: line/tm-db-testing
+      env:
+        CGO_LDFLAGS: -lrocksdb
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
