@@ -3,8 +3,10 @@ package db
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -66,6 +68,14 @@ func newTempDB(t *testing.T, backend BackendType) (db DB, dbDir string) {
 	db, err = NewDB("testdb", backend, dirname)
 	require.NoError(t, err)
 	return db, dirname
+}
+
+func newDB(t require.TestingT, backend BackendType) (DB, string, string) {
+	name := fmt.Sprintf("test_%x", randStr(12))
+	dir := os.TempDir()
+	db, err := NewDB(name, backend, dir)
+	require.NoError(t, err)
+	return db, dir, name
 }
 
 func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {

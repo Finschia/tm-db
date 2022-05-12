@@ -1,64 +1,47 @@
 //go:build rocksdb
 // +build rocksdb
 
+// Avoiding duplicate codes by lint, this implementation re-ordered functions
 package db
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
-func TestRDBNewDB(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewDB(name, RDBBackend, dir)
+func BenchmarkRDBRangeScans1M(b *testing.B) {
+	db, dir, name := newDB(b, RDBBackend)
 	defer closeDBWithCleanupDBDir(db, dir, name)
-	require.NoError(t, err)
+
+	benchmarkRangeScans(b, db, int64(1e6))
+}
+
+func BenchmarkRDBRangeScans10M(b *testing.B) {
+	db, dir, name := newDB(b, RDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(10e6))
+}
+
+func TestRDBNewDB(t *testing.T) {
+	db, dir, name := newDB(t, RDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
 	_, ok := db.(*RDB)
 	assert.True(t, ok)
 }
 
 func TestRDBStats(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewDB(name, RDBBackend, dir)
+	db, dir, name := newDB(t, RDBBackend)
 	defer closeDBWithCleanupDBDir(db, dir, name)
-	require.NoError(t, err)
 
 	assert.NotEmpty(t, db.Stats())
 }
 
-func BenchmarkRDBRangeScans1M(b *testing.B) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewDB(name, RDBBackend, dir)
-	defer closeDBWithCleanupDBDir(db, dir, name)
-	require.NoError(b, err)
-
-	benchmarkRangeScans(b, db, int64(1e6))
-}
-
-func BenchmarkRDBRangeScans10M(b *testing.B) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewDB(name, RDBBackend, dir)
-	defer closeDBWithCleanupDBDir(db, dir, name)
-	require.NoError(b, err)
-
-	benchmarkRangeScans(b, db, int64(10e6))
-}
-
 func BenchmarkRDBRandomReadsWrites(b *testing.B) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewRDB(name, dir)
+	db, dir, name := newDB(b, RDBBackend)
 	defer closeDBWithCleanupDBDir(db, dir, name)
-	require.NoError(b, err)
 
 	benchmarkRandomReadsWrites(b, db)
 }
