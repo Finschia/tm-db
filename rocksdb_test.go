@@ -10,7 +10,7 @@ import (
 )
 
 func TestRocksDBNewDB(t *testing.T) {
-	db, dir, name := newDB(t, RDBBackend)
+	db, dir, name := newDB(t, RocksDBBackend)
 	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
 
 	_, ok := db.(*RocksDB)
@@ -18,28 +18,28 @@ func TestRocksDBNewDB(t *testing.T) {
 }
 
 func TestRocksDBStats(t *testing.T) {
-	db, dir, name := newDB(t, RDBBackend)
+	db, dir, name := newDB(t, RocksDBBackend)
 	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
 
 	assert.NotEmpty(t, db.Stats())
 }
 
 func BenchmarkRocksDBRangeScans1M(b *testing.B) {
-	db, dir, name := newDB(b, RDBBackend)
+	db, dir, name := newDB(b, RocksDBBackend)
 	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
 
 	benchmarkRangeScans(b, db, int64(1e6))
 }
 
 func BenchmarkRocksDBRangeScans10M(b *testing.B) {
-	db, dir, name := newDB(b, RDBBackend)
+	db, dir, name := newDB(b, RocksDBBackend)
 	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
 
 	benchmarkRangeScans(b, db, int64(10e6))
 }
 
 func BenchmarkRocksDBRandomReadsWrites(b *testing.B) {
-	db, dir, name := newDB(b, RDBBackend)
+	db, dir, name := newDB(b, RocksDBBackend)
 	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
 
 	benchmarkRandomReadsWrites(b, db)
