@@ -1,7 +1,6 @@
 //go:build cleveldb
 // +build cleveldb
 
-// Avoiding duplicate codes by lint, this implementation re-ordered functions
 package db
 
 import (

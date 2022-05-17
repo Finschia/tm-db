@@ -1,7 +1,6 @@
 //go:build badgerdb
 // +build badgerdb
 
-// Avoiding duplicate codes by lint, this implementation re-ordered functions
 package db
 
 import (
