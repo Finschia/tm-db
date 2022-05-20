@@ -4,7 +4,7 @@ Common database interface for various database backends. This is forked for appl
 
 ### Minimum Go Version
 
-Go 1.17+
+Go 1.18+
 
 ## Supported Database Backends
 
