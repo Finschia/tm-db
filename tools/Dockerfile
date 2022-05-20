@@ -42,7 +42,7 @@ RUN rm -rf ./rocksdb-*.tar.gz rocksdb
 RUN rm -rf ./contrib
 
 # Install golangci for CI
-RUN go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@v1.43.0
+RUN go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2
 
 # Download dependency modules for CI
 WORKDIR /workspace
