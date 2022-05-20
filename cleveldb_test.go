@@ -11,7 +11,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 )
 
 func BenchmarkRandomReadsWrites2(b *testing.B) {
@@ -22,7 +21,8 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 	for i := 0; i < int(numItems); i++ {
 		internal[int64(i)] = int64(0)
 	}
-	db, err := NewCLevelDB(fmt.Sprintf("test_%x", randStr(12)), "")
+	dir := os.TempDir()
+	db, err := NewCLevelDB(fmt.Sprintf("test_%x", randStr(12)), dir)
 	if err != nil {
 		b.Fatal(err.Error())
 		return
@@ -81,25 +81,38 @@ func BenchmarkRandomReadsWrites2(b *testing.B) {
 	db.Close()
 }
 
-func TestCLevelDBBackend(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	// Can't use "" (current directory) or "./" here because levigo.Open returns:
-	// "Error initializing DB: IO error: test_XXX.db: Invalid argument"
-	dir := os.TempDir()
-	db, err := NewDB(name, CLevelDBBackend, dir)
-	require.NoError(t, err)
-	defer cleanupDBDir(dir, name)
+func TestCLevelDBNewDB(t *testing.T) {
+	db, dir, name := newDB(t, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
 	_, ok := db.(*CLevelDB)
 	assert.True(t, ok)
 }
 
 func TestCLevelDBStats(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	db, err := NewDB(name, CLevelDBBackend, dir)
-	require.NoError(t, err)
-	defer cleanupDBDir(dir, name)
+	db, dir, name := newDB(t, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
 	assert.NotEmpty(t, db.Stats())
+}
+
+func BenchmarkCLevelDBRangeScans1M(b *testing.B) {
+	db, dir, name := newDB(b, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(1e6))
+}
+
+func BenchmarkCLevelDBRangeScans10M(b *testing.B) {
+	db, dir, name := newDB(b, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(10e6))
+}
+
+func BenchmarkCLevelDBRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRandomReadsWrites(b, db)
 }

@@ -1,43 +1,43 @@
 package db
 
 import (
-	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-	"github.com/syndtr/goleveldb/leveldb/opt"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestGoLevelDBNewGoLevelDB(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	defer cleanupDBDir("", name)
+func BenchmarkGoLevelDBRangeScans1M(b *testing.B) {
+	db, dir, name := newDB(b, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
-	// Test we can't open the db twice for writing
-	wr1, err := NewGoLevelDB(name, "")
-	require.Nil(t, err)
-	_, err = NewGoLevelDB(name, "")
-	require.NotNil(t, err)
-	wr1.Close() // Close the db to release the lock
+	benchmarkRangeScans(b, db, int64(1e6))
+}
 
-	// Test we can open the db twice for reading only
-	ro1, err := NewGoLevelDBWithOpts(name, "", &opt.Options{ReadOnly: true})
-	require.Nil(t, err)
-	defer ro1.Close()
-	ro2, err := NewGoLevelDBWithOpts(name, "", &opt.Options{ReadOnly: true})
-	require.Nil(t, err)
-	defer ro2.Close()
+func BenchmarkGoLevelDBRangeScans10M(b *testing.B) {
+	db, dir, name := newDB(b, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(10e6))
 }
 
 func BenchmarkGoLevelDBRandomReadsWrites(b *testing.B) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	db, err := NewGoLevelDB(name, "")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer func() {
-		db.Close()
-		cleanupDBDir("", name)
-	}()
+	db, dir, name := newDB(b, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
 	benchmarkRandomReadsWrites(b, db)
+}
+
+func TestGoLevelDBNewDB(t *testing.T) {
+	db, dir, name := newDB(t, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	_, ok := db.(*GoLevelDB)
+	assert.True(t, ok)
+}
+
+func TestGoLevelDBStats(t *testing.T) {
+	db, dir, name := newDB(t, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	assert.NotEmpty(t, db.Stats())
 }

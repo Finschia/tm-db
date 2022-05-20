@@ -31,6 +31,7 @@ jobs:
     outputs:
       paths: ${{ steps.filter.outputs.paths }}
     steps:
+      - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
         id: filter
         with:
@@ -46,6 +47,8 @@ jobs:
     if: ${{ inputs.CACHE_FILE == '' && needs.changes.outputs.paths != 'true' }}
     container:
       image: line/tm-db-testing
+      env:
+        CGO_LDFLAGS: -lrocksdb
       credentials:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}

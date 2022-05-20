@@ -4,33 +4,47 @@
 package db
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestBoltDBNewBoltDB(t *testing.T) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	dir := os.TempDir()
-	defer cleanupDBDir(dir, name)
+func TestBoltDBNewDB(t *testing.T) {
+	db, dir, name := newDB(t, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
-	db, err := NewBoltDB(name, dir)
-	require.NoError(t, err)
-	db.Close()
+	_, ok := db.(*BoltDB)
+	assert.True(t, ok)
+}
+
+func TestBoltDBStats(t *testing.T) {
+	db, dir, name := newDB(t, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	assert.NotEmpty(t, db.Stats())
+}
+
+// Cannot work well since the data setup time is long (10min over)
+// See the read/write performance: BenchmarkBoltDBRandomReadsWrites
+func TempBenchmarkBoltDBRangeScans1M(b *testing.B) {
+	db, dir, name := newDB(b, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(1e6))
+}
+
+// Cannot work well since the data setup time is long (10min over)
+// See the read/write performance: BenchmarkBoltDBRandomReadsWrites
+func TempBenchmarkBoltDBRangeScans10M(b *testing.B) {
+	db, dir, name := newDB(b, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkRangeScans(b, db, int64(10e6))
 }
 
 func BenchmarkBoltDBRandomReadsWrites(b *testing.B) {
-	name := fmt.Sprintf("test_%x", randStr(12))
-	db, err := NewBoltDB(name, "")
-	if err != nil {
-		b.Fatal(err)
-	}
-	defer func() {
-		db.Close()
-		cleanupDBDir("", name)
-	}()
+	db, dir, name := newDB(b, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
 
 	benchmarkRandomReadsWrites(b, db)
 }
