@@ -102,14 +102,14 @@ lint:
 lint-all: build-cleveldb build-rocksdb
 	@echo "--> Running linter"
 	@CGO_CFLAGS="$(CGO_CFLAGS)" CGO_LDFLAGS="$(CGO_LDFLAGS)" \
-	golangci-lint run --build-tags "cleveldb,rocksdb,boltdb,badgerdb"
+	golangci-lint run --build-tags "cleveldb,rocksdb,boltdb,badgerdb" --timeout 5m
 	@go mod verify
 .PHONY: lint-all
 
 lint-all-docker:
 	@echo "--> Running go lint"
 	@docker run --rm -e CGO_LDFLAGS="-lrocksdb" -v $(CURDIR):/workspace --workdir /workspace $(DOCKER_IMAGE) \
-	golangci-lint run --build-tags "cleveldb,rocksdb,boltdb,badgerdb"
+	golangci-lint run --build-tags "cleveldb,rocksdb,boltdb,badgerdb" --timeout 5m
 .PHONY: test-all-docker
 
 format:

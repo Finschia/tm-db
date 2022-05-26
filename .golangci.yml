@@ -16,15 +16,15 @@ linters:
     # - godox
     - gofmt
     - goimports
-    - golint
+    # - golint
     - gosec
     - gosimple
-    - govet
+    # - govet
     - ineffassign
     # - interfacer
     - lll
     - misspell
-    - maligned
+    # - maligned
     - nakedret
     - prealloc
     # - scopelint
@@ -40,6 +40,7 @@ linters:
     # - wsl
     # - gocognit
     - nolintlint
+    - revive
 
 issues:
   exclude-rules:

@@ -7,7 +7,7 @@
 # updates here, merge the changes here first and let the image get updated (or
 # push a new version manually) before PRs that depend on them.
 
-FROM golang:1.16-bullseye AS build
+FROM golang:1.18-bullseye AS build
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
@@ -42,7 +42,7 @@ RUN rm -rf ./rocksdb-*.tar.gz rocksdb
 RUN rm -rf ./contrib
 
 # Install golangci for CI
-RUN go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@v1.43.0
+RUN go install -v github.com/golangci/golangci-lint/cmd/golangci-lint@v1.46.2
 
 # Download dependency modules for CI
 WORKDIR /workspace
