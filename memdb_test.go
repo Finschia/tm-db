@@ -24,3 +24,10 @@ func BenchmarkMemDBRandomReadsWrites(b *testing.B) {
 
 	benchmarkRandomReadsWrites(b, db)
 }
+
+func BenchmarkMemDBParallelRandomReadsWrites(b *testing.B) {
+	db := NewMemDB()
+	defer db.Close()
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}

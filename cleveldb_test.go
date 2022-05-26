@@ -116,3 +116,10 @@ func BenchmarkCLevelDBRandomReadsWrites(b *testing.B) {
 
 	benchmarkRandomReadsWrites(b, db)
 }
+
+func BenchmarkCLevelDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, CLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}

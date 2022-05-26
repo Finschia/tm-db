@@ -44,3 +44,10 @@ func BenchmarkRDBRandomReadsWrites(b *testing.B) {
 
 	benchmarkRandomReadsWrites(b, db)
 }
+
+func BenchmarkRDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, RDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}
