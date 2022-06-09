@@ -27,6 +27,13 @@ func BenchmarkGoLevelDBRandomReadsWrites(b *testing.B) {
 	benchmarkRandomReadsWrites(b, db)
 }
 
+func BenchmarkGoLevelDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, GoLevelDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}
+
 func TestGoLevelDBNewDB(t *testing.T) {
 	db, dir, name := newDB(t, GoLevelDBBackend)
 	defer closeDBWithCleanupDBDir(db, dir, name)

@@ -31,6 +31,13 @@ func BenchmarkBadgerDBRandomReadsWrites(b *testing.B) {
 	benchmarkRandomReadsWrites(b, db)
 }
 
+func BenchmarkBadgerDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, BadgerDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}
+
 // Cannot work well since the data setup time is long (10min over)
 // See the read/write performance: BenchmarkBadgerDBRandomReadsWrites
 func TempBenchmarkBadgerDBRangeScans1M(b *testing.B) {

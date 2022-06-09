@@ -44,3 +44,10 @@ func BenchmarkRocksDBRandomReadsWrites(b *testing.B) {
 
 	benchmarkRandomReadsWrites(b, db)
 }
+
+func BenchmarkRocksDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, RocksDBBackend)
+	defer cleanupDBDir(dir, name) // Cannot use `closeDBWithCleanupDBDir`
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}

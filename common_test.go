@@ -1,7 +1,6 @@
 package db
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
@@ -111,63 +110,62 @@ func benchmarkRangeScans(b *testing.B, db DB, dbSize int64) {
 }
 
 func benchmarkRandomReadsWrites(b *testing.B, db DB) {
-	b.StopTimer()
-
-	// create dummy data
 	const numItems = int64(1000000)
-	internal := map[int64]int64{}
-	for i := 0; i < int(numItems); i++ {
-		internal[int64(i)] = int64(0)
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		benchmarkRandomReadWrite(b, db, numItems)
+	}
+}
+
+func benchmarkParallelRandomReadsWrites(b *testing.B, db DB) {
+	const numItems = int64(1000000)
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			benchmarkRandomReadWrite(b, db, numItems)
+		}
+	})
+}
+
+func benchmarkRandomReadWrite(b *testing.B, db DB, numItems int64) {
+	// Write something
+	{
+		idx := rand.Int63n(numItems)
+		val := idx + 2
+		idxBytes := int642Bytes(idx)
+		valBytes := int642Bytes(val)
+		// fmt.Printf("Set %X -> %X\n", idxBytes, valBytes)
+		err := db.Set(idxBytes, valBytes)
+		if err != nil {
+			// require.NoError() is very expensive (according to profiler), so check manually
+			b.Fatal(b, err)
+		}
 	}
 
-	// fmt.Println("ok, starting")
-	b.StartTimer()
-
-	for i := 0; i < b.N; i++ {
-		// Write something
-		{
-			idx := rand.Int63n(numItems)
-			internal[idx]++
-			val := internal[idx]
-			idxBytes := int642Bytes(idx)
-			valBytes := int642Bytes(val)
-			// fmt.Printf("Set %X -> %X\n", idxBytes, valBytes)
-			err := db.Set(idxBytes, valBytes)
-			if err != nil {
-				// require.NoError() is very expensive (according to profiler), so check manually
-				b.Fatal(b, err)
-			}
+	// Read something
+	{
+		idx := rand.Int63n(numItems)
+		valExp := idx + 2
+		idxBytes := int642Bytes(idx)
+		valBytes, err := db.Get(idxBytes)
+		if err != nil {
+			// require.NoError() is very expensive (according to profiler), so check manually
+			b.Fatal(b, err)
 		}
-
-		// Read something
-		{
-			idx := rand.Int63n(numItems)
-			valExp := internal[idx]
-			idxBytes := int642Bytes(idx)
-			valBytes, err := db.Get(idxBytes)
-			if err != nil {
-				// require.NoError() is very expensive (according to profiler), so check manually
-				b.Fatal(b, err)
+		// fmt.Printf("Get %X -> %X\n", idxBytes, valBytes)
+		if valBytes != nil {
+			if len(valBytes) != 8 {
+				b.Errorf("Expected length 8 for %v, got %X", idx, valBytes)
+				b.Fail()
 			}
-			// fmt.Printf("Get %X -> %X\n", idxBytes, valBytes)
-			if valExp == 0 {
-				if !bytes.Equal(valBytes, nil) {
-					b.Errorf("Expected %v for %v, got %X", nil, idx, valBytes)
-					break
-				}
-			} else {
-				if len(valBytes) != 8 {
-					b.Errorf("Expected length 8 for %v, got %X", idx, valBytes)
-					break
-				}
-				valGot := bytes2Int64(valBytes)
+			valGot := bytes2Int64(valBytes)
+			if valGot > 1 { // cleveldb return 1 even if `idx` doesn't exist
 				if valExp != valGot {
 					b.Errorf("Expected %v for %v, got %v", valExp, idx, valGot)
-					break
+					b.Fail()
 				}
 			}
 		}
-
 	}
 }
 

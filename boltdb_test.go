@@ -48,3 +48,10 @@ func BenchmarkBoltDBRandomReadsWrites(b *testing.B) {
 
 	benchmarkRandomReadsWrites(b, db)
 }
+
+func BenchmarkBoltDBParallelRandomReadsWrites(b *testing.B) {
+	db, dir, name := newDB(b, BoltDBBackend)
+	defer closeDBWithCleanupDBDir(db, dir, name)
+
+	benchmarkParallelRandomReadsWrites(b, db)
+}
